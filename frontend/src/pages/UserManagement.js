@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
-import { getUsersOverview, getAllUsers, setUserAdminVerified } from '../services/api';
+import { getUsersOverview, getAllUsers, setUserAdminVerified, createUser, updateUser, deleteUser } from '../services/api';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -11,6 +11,15 @@ const UserManagement = () => {
   const [error, setError] = useState('');
   const { token } = useContext(AuthContext);
 
+  // Modal states
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editUser, setEditUser] = useState(null);
+  const [formData, setFormData] = useState({
+    email: '', password: '', temp_id: '', auth_type: '', persona_type: '',
+    created_at: '', updated_at: '', deleted_at: '', email_verified_at: '', verified_by_admin: false
+  });
+
   // Load users from API
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -18,7 +27,8 @@ const UserManagement = () => {
     try {
       // You can use getAllUsers(token) for full list, or getUsersOverview(token) for summary
       const data = await getAllUsers(token);
-      setUsers(data);
+      // Ensure verified_by_admin is always boolean
+      setUsers(data.map(user => ({ ...user, verified_by_admin: !!user.verified_by_admin })));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -76,10 +86,52 @@ const UserManagement = () => {
     }
   };
 
+  // Add User
+  const handleAddUser = async () => {
+    try {
+      await createUser(token, formData);
+      setShowAddModal(false);
+      setFormData({ email: '', password: '', temp_id: '', auth_type: '', persona_type: '', created_at: '', updated_at: '', deleted_at: '', email_verified_at: '', verified_by_admin: false });
+      loadUsers();
+      alert('User added successfully!');
+    } catch (error) {
+      setError(error.message);
+      alert('Failed to add user');
+    }
+  };
+
+  // Edit User
+  const handleEditUser = async () => {
+    try {
+      await updateUser(token, editUser.id, formData);
+      setShowEditModal(false);
+      setEditUser(null);
+      setFormData({ email: '', password: '', temp_id: '', auth_type: '', persona_type: '', created_at: '', updated_at: '', deleted_at: '', email_verified_at: '', verified_by_admin: false });
+      loadUsers();
+      alert('User updated successfully!');
+    } catch (error) {
+      setError(error.message);
+      alert('Failed to update user');
+    }
+  };
+
+  // Delete User
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    try {
+      await deleteUser(token, userId);
+      loadUsers();
+      alert('User deleted successfully!');
+    } catch (error) {
+      setError(error.message);
+      alert('Failed to delete user');
+    }
+  };
+
   const filteredUsers = users.filter(user => {
     // Filter by verification status
-    if (filter === 'verified' && !user.isApproved) return false;
-    if (filter === 'unverified' && user.isApproved) return false;
+    if (filter === 'verified' && !user.verified_by_admin) return false;
+    if (filter === 'unverified' && user.verified_by_admin) return false;
     
     // Filter by search term
     if (searchTerm) {
@@ -154,6 +206,48 @@ const UserManagement = () => {
 
   return (
     <div style={{ padding: '20px', height: '100%' }}>
+      {/* Add User Button */}
+      <button
+        onClick={() => setShowAddModal(true)}
+        style={{ marginBottom: '20px', padding: '10px 16px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '500' }}
+      >
+        ➕ Add User
+      </button>
+
+      {/* Add User Modal */}
+      {showAddModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', padding: '30px', borderRadius: '8px', minWidth: '350px' }}>
+            <h2>Add User</h2>
+            {/* Simple form for user fields */}
+            <input type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <input type="text" placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <input type="text" placeholder="Temp ID" value={formData.temp_id} onChange={e => setFormData({ ...formData, temp_id: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <input type="text" placeholder="Auth Type" value={formData.auth_type} onChange={e => setFormData({ ...formData, auth_type: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <input type="text" placeholder="Persona Type" value={formData.persona_type} onChange={e => setFormData({ ...formData, persona_type: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <button onClick={handleAddUser} style={{ background: '#28a745', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', marginRight: '10px' }}>Add</button>
+            <button onClick={() => setShowAddModal(false)} style={{ background: '#dc3545', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', padding: '30px', borderRadius: '8px', minWidth: '350px' }}>
+            <h2>Edit User</h2>
+            <input type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <input type="text" placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <input type="text" placeholder="Temp ID" value={formData.temp_id} onChange={e => setFormData({ ...formData, temp_id: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <input type="text" placeholder="Auth Type" value={formData.auth_type} onChange={e => setFormData({ ...formData, auth_type: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <input type="text" placeholder="Persona Type" value={formData.persona_type} onChange={e => setFormData({ ...formData, persona_type: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
+            <button onClick={handleEditUser} style={{ background: '#007bff', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', marginRight: '10px' }}>Save</button>
+            <button onClick={() => setShowEditModal(false)} style={{ background: '#dc3545', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Error Message */}
       {error && (
         <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>
       )}
@@ -206,8 +300,8 @@ const UserManagement = () => {
             }}
           >
             <option value="all">All Users</option>
-            <option value="verified">✅ Approved Users</option>
-            <option value="unverified">❌ Pending Approval</option>
+            <option value="verified"> Approved Users</option>
+            <option value="unverified"> Pending Approval</option>
           </select>
 
           {/* Bulk Actions */}
@@ -290,15 +384,7 @@ const UserManagement = () => {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               {filteredUsers.map((user) => (
-                <div key={user.id} style={{
-                  padding: '20px',
-                  border: '1px solid #e3e6f0',
-                  borderRadius: '8px',
-                  transition: 'box-shadow 0.3s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)'}
-                onMouseLeave={(e) => e.target.style.boxShadow = 'none'}
-                >
+                <div key={user.id} style={{ padding: '20px', border: '1px solid #e3e6f0', borderRadius: '8px', transition: 'box-shadow 0.3s ease' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ display: 'flex', gap: '15px', flex: 1 }}>
                       {/* Selection Checkbox */}
@@ -318,8 +404,8 @@ const UserManagement = () => {
                           <span style={getPersonaTypeBadge(user.persona_type)}>
                             {user.persona_type.replace('_', ' ')}
                           </span>
-                          <span style={getApprovalBadge(user.isApproved)}>
-                            {user.isApproved ? '✅ APPROVED' : '❌ PENDING'}
+                          <span style={getApprovalBadge(user.verified_by_admin)}>
+                            {user.verified_by_admin ? ' APPROVED' : ' PENDING'}
                           </span>
                         </div>
 
@@ -328,10 +414,10 @@ const UserManagement = () => {
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', fontSize: '13px', color: '#6c757d' }}>
-                          <span>🏢 {user.profile_title || 'No title'}</span>
-                          <span>🌍 {user.country || 'Not specified'}</span>
-                          <span>💼 {user.industry || 'Not specified'}</span>
-                          <span>🎂 {user.age ? `${user.age} years` : 'Age not provided'}</span>
+                          <span>{user.profile_title || 'No title'}</span>
+                          <span> {user.country || 'Not specified'}</span>
+                          <span> {user.industry || 'Not specified'}</span>
+                          <span> {user.age ? `${user.age} years` : 'Age not provided'}</span>
                         </div>
 
                         {user.linkedin && (
@@ -343,10 +429,10 @@ const UserManagement = () => {
                         )}
 
                         <div style={{ marginTop: '8px', fontSize: '12px', color: '#6c757d' }}>
-                          📅 Joined: {new Date(user.created_at).toLocaleDateString()}
+                           Joined: {new Date(user.created_at).toLocaleDateString()}
                           {user.email_verified_at && (
                             <span style={{ marginLeft: '15px' }}>
-                              ✅ Email verified: {new Date(user.email_verified_at).toLocaleDateString()}
+                               Email verified: {new Date(user.email_verified_at).toLocaleDateString()}
                             </span>
                           )}
                         </div>
@@ -355,7 +441,7 @@ const UserManagement = () => {
 
                     {/* Action Buttons */}
                     <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                      {user.isApproved ? (
+                      {user.verified_by_admin ? (
                         <button
                           onClick={() => handleRevokeApproval(user.id)}
                           style={{
@@ -387,16 +473,32 @@ const UserManagement = () => {
                         </button>
                       )}
                       
-                      <button style={{
-                        padding: '8px 12px',
-                        backgroundColor: 'transparent',
-                        color: '#007bff',
-                        border: '1px solid #007bff',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px'
-                      }}>
-                        View Profile
+                      <button
+                        onClick={() => {
+                          setEditUser(user);
+                          setFormData({
+                            email: user.email,
+                            password: user.password,
+                            temp_id: user.temp_id,
+                            auth_type: user.auth_type,
+                            persona_type: user.persona_type,
+                            created_at: user.created_at,
+                            updated_at: user.updated_at,
+                            deleted_at: user.deleted_at,
+                            email_verified_at: user.email_verified_at,
+                            verified_by_admin: user.verified_by_admin
+                          });
+                          setShowEditModal(true);
+                        }}
+                        style={{ padding: '8px 12px', backgroundColor: '#ffc107', color: '#212529', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
+                        style={{ padding: '8px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
+                      >
+                        🗑️ Delete
                       </button>
                     </div>
                   </div>

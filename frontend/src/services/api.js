@@ -70,3 +70,40 @@ export async function getAdminSettings(token) {
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch settings');
   return res.json();
 }
+
+export async function createUser(token, userData) {
+  const res = await fetch(`${API_BASE}/api/users`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(userData)
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to create user');
+  return res.json();
+}
+
+export async function updateUser(token, userId, userData) {
+  const res = await fetch(`${API_BASE}/api/users/${userId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(userData)
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update user');
+  return res.json();
+}
+
+export async function deleteUser(token, userId) {
+  const res = await fetch(`${API_BASE}/api/users/${userId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to delete user');
+  return res.json();
+}
