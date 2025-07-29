@@ -1,5 +1,6 @@
 // src/controllers/usersController.js
 import pool from '../models/db.js';
+import bcrypt from 'bcryptjs';
 
 export const getUsersOverview = async (req, res) => {
   try {
@@ -61,6 +62,11 @@ export const createUser = async (req, res) => {
   updated_at = updated_at || now;
   deleted_at = deleted_at || null;
   email_verified_at = email_verified_at || null;
+  // Encrypt password if provided
+  if (password) {
+    const salt = await bcrypt.genSalt(12);
+    password = await bcrypt.hash(password, salt);
+  }
   try {
     const result = await pool.query(
       `INSERT INTO users (email, password, temp_id, auth_type, persona_type, created_at, updated_at, deleted_at, email_verified_at, verified_by_admin)
