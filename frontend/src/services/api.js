@@ -1,5 +1,50 @@
 // src/services/api.js
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:3001';
+import axios from 'axios';
+
+
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:3001'; // Fallback port now matches .env
+
+
+// Create axios instance
+const api = axios.create({
+  baseURL: API_BASE, // Fixed variable name
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor to add auth token if needed
+api.interceptors.request.use(
+  (config) => {
+    // Add auth token if available
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', error.response?.data || error.message);
+    
+    // Handle 401 unauthorized
+    if (error.response?.status === 401) {
+      localStorage.removeItem('authToken');
+      // Redirect to login if needed
+      // window.location.href = '/login';
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 // ===== AUTHENTICATION =====
 export async function login(email, password) {
@@ -178,11 +223,7 @@ export async function getDynamicLensSuggestions(token, ideaId) {
   return res.json();
 }
 
-// Add these to your src/services/api.js file:
-
 // ===== SURVEY/FORMS MANAGEMENT =====
-
-// Get all surveys with analytics
 export async function getAllSurveys(token) {
   const res = await fetch(`${API_BASE}/api/forms`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -191,7 +232,6 @@ export async function getAllSurveys(token) {
   return res.json();
 }
 
-// Get detailed survey information
 export async function getSurveyById(token, surveyId) {
   const res = await fetch(`${API_BASE}/api/forms/${surveyId}`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -200,7 +240,6 @@ export async function getSurveyById(token, surveyId) {
   return res.json();
 }
 
-// Create new survey
 export async function createSurvey(token, surveyData) {
   const res = await fetch(`${API_BASE}/api/forms`, {
     method: 'POST',
@@ -214,7 +253,6 @@ export async function createSurvey(token, surveyData) {
   return res.json();
 }
 
-// Update survey
 export async function updateSurvey(token, surveyId, surveyData) {
   const res = await fetch(`${API_BASE}/api/forms/${surveyId}`, {
     method: 'PUT',
@@ -228,7 +266,6 @@ export async function updateSurvey(token, surveyId, surveyData) {
   return res.json();
 }
 
-// Delete survey
 export async function deleteSurvey(token, surveyId) {
   const res = await fetch(`${API_BASE}/api/forms/${surveyId}`, {
     method: 'DELETE',
@@ -238,7 +275,6 @@ export async function deleteSurvey(token, surveyId) {
   return res.json();
 }
 
-// Start survey
 export async function startSurvey(token, surveyId, durationDays = null) {
   const res = await fetch(`${API_BASE}/api/forms/${surveyId}/start`, {
     method: 'POST',
@@ -252,7 +288,6 @@ export async function startSurvey(token, surveyId, durationDays = null) {
   return res.json();
 }
 
-// Stop survey
 export async function stopSurvey(token, surveyId) {
   const res = await fetch(`${API_BASE}/api/forms/${surveyId}/stop`, {
     method: 'POST',
@@ -262,7 +297,6 @@ export async function stopSurvey(token, surveyId) {
   return res.json();
 }
 
-// Get survey analytics
 export async function getSurveyAnalytics(token) {
   const res = await fetch(`${API_BASE}/api/forms/analytics`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -271,7 +305,6 @@ export async function getSurveyAnalytics(token) {
   return res.json();
 }
 
-// Get surveys by idea/study
 export async function getSurveysByIdea(token, ideaId) {
   const res = await fetch(`${API_BASE}/api/forms/idea/${ideaId}`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -279,6 +312,7 @@ export async function getSurveysByIdea(token, ideaId) {
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch surveys for idea');
   return res.json();
 }
+
 // ===== SME =====
 export async function getSMEOverview(token) {
   const res = await fetch(`${API_BASE}/api/sme/overview`, {
@@ -296,3 +330,64 @@ export async function getAdminSettings(token) {
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch settings');
   return res.json();
 }
+
+// ===== ANALYTICS API FUNCTIONS =====
+// Updated to use direct fetch for analytics (no auth required for testing)
+export const analyticsAPI = {
+  // Health check
+  health: () => fetch(`${API_BASE}/api/analytics/health`).then(res => res.json()),
+  
+  // User analytics
+  getUsersOverview: (period = 'all') => 
+    fetch(`${API_BASE}/api/analytics/users/overview?period=${period}`).then(res => res.json()),
+  
+  getUsersGrowth: (period = '30') => 
+    fetch(`${API_BASE}/api/analytics/users/growth?period=${period}`).then(res => res.json()),
+  
+  getUsersDemographics: () => 
+    fetch(`${API_BASE}/api/analytics/users/demographics`).then(res => res.json()),
+  
+  // Ideas analytics
+  getIdeasOverview: (period = 'all') => 
+    fetch(`${API_BASE}/api/analytics/ideas/overview?period=${period}`).then(res => res.json()),
+  
+  // Forms analytics
+  getFormsOverview: (period = 'all') => 
+    fetch(`${API_BASE}/api/analytics/forms/overview?period=${period}`).then(res => res.json()),
+  
+  // SME analytics
+  getSMEOverview: (period = 'all') => 
+    fetch(`${API_BASE}/api/analytics/sme/overview?period=${period}`).then(res => res.json()),
+  
+  // Bookings analytics
+  getBookingsOverview: (period = 'all') => 
+    fetch(`${API_BASE}/api/analytics/bookings/overview?period=${period}`).then(res => res.json()),
+  
+  // Chime analytics
+  getChimeOverview: (period = 'all') => 
+    fetch(`${API_BASE}/api/analytics/chime/overview?period=${period}`).then(res => res.json()),
+  
+  getChimeTranscripts: (period = '30') => 
+    fetch(`${API_BASE}/api/analytics/chime/transcripts?period=${period}`).then(res => res.json()),
+  
+  // Engagement analytics
+  getEngagementFunnel: () => 
+    fetch(`${API_BASE}/api/analytics/engagement/funnel`).then(res => res.json()),
+  
+  // Realtime analytics
+  getRealtime: () => 
+    fetch(`${API_BASE}/api/analytics/realtime`).then(res => res.json()),
+};
+
+// General API functions
+export const generalAPI = {
+  // Auth
+  login: (credentials) => api.post('/api/auth/login', credentials),
+  
+  // Users
+  getUsers: () => api.get('/api/users'),
+  
+  // Add other endpoints as needed
+};
+
+export default api;

@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { protect } from './src/middleware/auth.middleware.js';
 
+
 // Import route handlers
 import authRoutes from './src/api/auth/auth.routes.js'; // Uncomment when implemented
 import userRoutes from './src/routes/users.js';
@@ -11,6 +12,7 @@ import ideasRoutes from './src/routes/ideas.js';
 import formsRoutes from './src/routes/forms.js';
 import smeRoutes from './src/routes/sme.js';
 import settingsRoutes from './src/routes/settings.js';
+import analyticsRoutes from './src/routes/analytics.js';
 
 dotenv.config();
 const app = express();
@@ -27,6 +29,7 @@ app.use('/api/ideas', protect, ideasRoutes);
 app.use('/api/forms', protect, formsRoutes);
 app.use('/api/sme', protect, smeRoutes);
 app.use('/api/settings', protect, settingsRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`🚀 Backend server running on http://localhost:${PORT}`));
