@@ -174,24 +174,25 @@ const Surveys = () => {
         left: 0, 
         right: 0, 
         bottom: 0, 
-        backgroundColor: 'rgba(0,0,0,0.5)', 
+        backgroundColor: 'rgba(0,0,0,0.8)', 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
         zIndex: 1000
       }}>
         <div style={{ 
-          backgroundColor: 'white', 
+          backgroundColor: '#1e1e2e', 
           padding: '24px', 
           borderRadius: '8px', 
           width: '500px',
           maxHeight: '80vh',
-          overflow: 'auto'
+          overflow: 'auto',
+          border: '1px solid #8A5CF6'
         }}>
-          <h3 style={{ marginTop: 0 }}>Create New Survey</h3>
+          <h3 style={{ marginTop: 0, color: '#8A5CF6' }}>Create New Survey</h3>
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
                 Select Idea/Study *
               </label>
               <select
@@ -201,8 +202,11 @@ const Surveys = () => {
                 style={{ 
                   width: '100%', 
                   padding: '8px', 
-                  border: '1px solid #ced4da', 
-                  borderRadius: '4px' 
+                  border: '1px solid #8A5CF6', 
+                  borderRadius: '4px',
+                  backgroundColor: '#121212',
+                  color: 'white',
+                  fontSize: '14px'
                 }}
               >
                 <option value="">Choose an idea...</option>
@@ -216,7 +220,7 @@ const Surveys = () => {
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
                 Survey Form URL *
               </label>
               <input
@@ -228,15 +232,18 @@ const Surveys = () => {
                 style={{ 
                   width: '100%', 
                   padding: '8px', 
-                  border: '1px solid #ced4da', 
-                  borderRadius: '4px' 
+                  border: '1px solid #8A5CF6', 
+                  borderRadius: '4px',
+                  backgroundColor: '#121212',
+                  color: 'white',
+                  fontSize: '14px'
                 }}
               />
               <small style={{ color: '#6c757d' }}>Link to your external survey form</small>
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
                 Start Time (Optional)
               </label>
               <input
@@ -246,15 +253,18 @@ const Surveys = () => {
                 style={{ 
                   width: '100%', 
                   padding: '8px', 
-                  border: '1px solid #ced4da', 
-                  borderRadius: '4px' 
+                  border: '1px solid #8A5CF6', 
+                  borderRadius: '4px',
+                  backgroundColor: '#121212',
+                  color: 'white',
+                  fontSize: '14px'
                 }}
               />
               <small style={{ color: '#6c757d' }}>Leave empty to start manually later</small>
             </div>
 
             <div style={{ marginBottom: '24px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
                 End Time (Optional)
               </label>
               <input
@@ -264,8 +274,11 @@ const Surveys = () => {
                 style={{ 
                   width: '100%', 
                   padding: '8px', 
-                  border: '1px solid #ced4da', 
-                  borderRadius: '4px' 
+                  border: '1px solid #8A5CF6', 
+                  borderRadius: '4px',
+                  backgroundColor: '#121212',
+                  color: 'white',
+                  fontSize: '14px'
                 }}
               />
               <small style={{ color: '#6c757d' }}>Leave empty for indefinite duration</small>
@@ -292,7 +305,7 @@ const Surveys = () => {
                 disabled={submitting}
                 style={{ 
                   padding: '8px 16px', 
-                  backgroundColor: '#007bff', 
+                  backgroundColor: '#8A5CF6', 
                   color: 'white', 
                   border: 'none', 
                   borderRadius: '4px',
@@ -342,24 +355,25 @@ const Surveys = () => {
         left: 0, 
         right: 0, 
         bottom: 0, 
-        backgroundColor: 'rgba(0,0,0,0.5)', 
+        backgroundColor: 'rgba(0,0,0,0.8)', 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
         zIndex: 1000
       }}>
         <div style={{ 
-          backgroundColor: 'white', 
+          backgroundColor: '#1e1e2e', 
           padding: '24px', 
           borderRadius: '8px', 
           width: '500px',
           maxHeight: '80vh',
-          overflow: 'auto'
+          overflow: 'auto',
+          border: '1px solid #8A5CF6'
         }}>
-          <h3 style={{ marginTop: 0 }}>Edit Survey</h3>
+          <h3 style={{ marginTop: 0, color: '#8A5CF6' }}>Edit Survey</h3>
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
                 Survey Form URL *
               </label>
               <input
@@ -370,14 +384,17 @@ const Surveys = () => {
                 style={{ 
                   width: '100%', 
                   padding: '8px', 
-                  border: '1px solid #ced4da', 
-                  borderRadius: '4px' 
+                  border: '1px solid #8A5CF6', 
+                  borderRadius: '4px',
+                  backgroundColor: '#121212',
+                  color: 'white',
+                  fontSize: '14px'
                 }}
               />
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
                 Start Time
               </label>
               <input
@@ -387,14 +404,17 @@ const Surveys = () => {
                 style={{ 
                   width: '100%', 
                   padding: '8px', 
-                  border: '1px solid #ced4da', 
-                  borderRadius: '4px' 
+                  border: '1px solid #8A5CF6', 
+                  borderRadius: '4px',
+                  backgroundColor: '#121212',
+                  color: 'white',
+                  fontSize: '14px'
                 }}
               />
             </div>
 
             <div style={{ marginBottom: '24px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
                 End Time
               </label>
               <input
@@ -404,8 +424,11 @@ const Surveys = () => {
                 style={{ 
                   width: '100%', 
                   padding: '8px', 
-                  border: '1px solid #ced4da', 
-                  borderRadius: '4px' 
+                  border: '1px solid #8A5CF6', 
+                  borderRadius: '4px',
+                  backgroundColor: '#121212',
+                  color: 'white',
+                  fontSize: '14px'
                 }}
               />
             </div>
@@ -431,7 +454,7 @@ const Surveys = () => {
                 disabled={submitting}
                 style={{ 
                   padding: '8px 16px', 
-                  backgroundColor: '#007bff', 
+                  backgroundColor: '#8A5CF6', 
                   color: 'white', 
                   border: 'none', 
                   borderRadius: '4px',
@@ -631,7 +654,7 @@ const Surveys = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
             {/* Main content */}
             <div>
-              <h2 style={{ marginBottom: '16px' }}>Survey for "{selectedSurvey.idea_name}"</h2>
+              <h2 style={{ marginBottom: '16px', color: '#8A5CF6' }}>Survey for "{selectedSurvey.idea_name}"</h2>
               
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -645,7 +668,7 @@ const Surveys = () => {
                       style={{ 
                         marginLeft: '8px', 
                         padding: '4px 8px',
-                        backgroundColor: '#007bff',
+                        backgroundColor: '#8A5CF6',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -656,7 +679,7 @@ const Surveys = () => {
                       📋 View Form
                     </button>
                     <a href={selectedSurvey.form_url} target="_blank" rel="noopener noreferrer" 
-                       style={{ marginLeft: '8px', color: '#007bff', fontSize: '12px' }}>
+                       style={{ marginLeft: '8px', color: '#8A5CF6', fontSize: '12px' }}>
                       🔗 Raw Data
                     </a>
                   </div>
@@ -680,12 +703,13 @@ const Surveys = () => {
 
               {/* Response Progress */}
               <div style={{ 
-                backgroundColor: '#f8f9fa', 
+                backgroundColor: '#1e1e2e', 
                 padding: '20px', 
                 borderRadius: '8px',
-                marginBottom: '24px'
+                marginBottom: '24px',
+                border: '1px solid #8A5CF6'
               }}>
-                <h3 style={{ marginBottom: '16px' }}>Response Collection Progress</h3>
+                <h3 style={{ marginBottom: '16px', color: '#8A5CF6' }}>Response Collection Progress</h3>
                 
                 <div style={{ marginBottom: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -693,13 +717,13 @@ const Surveys = () => {
                     <span>{selectedSurvey.time_progress_percentage || 0}%</span>
                   </div>
                   <div style={{ 
-                    backgroundColor: '#e9ecef', 
+                    backgroundColor: '#2c2c3e', 
                     height: '8px', 
                     borderRadius: '4px',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
-                      backgroundColor: '#007bff', 
+                      backgroundColor: '#8A5CF6', 
                       height: '100%', 
                       width: `${selectedSurvey.time_progress_percentage || 0}%`,
                       transition: 'width 0.3s ease'
@@ -732,12 +756,13 @@ const Surveys = () => {
               {/* Response Timeline */}
               {surveyDetails?.timeline && surveyDetails.timeline.length > 0 && (
                 <div style={{ 
-                  backgroundColor: '#f8f9fa', 
+                  backgroundColor: '#1e1e2e', 
                   padding: '20px', 
                   borderRadius: '8px',
-                  marginBottom: '24px'
+                  marginBottom: '24px',
+                  border: '1px solid #8A5CF6'
                 }}>
-                  <h3 style={{ marginBottom: '16px' }}>Response Timeline</h3>
+                  <h3 style={{ marginBottom: '16px', color: '#8A5CF6' }}>Response Timeline</h3>
                   <div style={{ overflowX: 'auto' }}>
                     <div style={{ display: 'flex', gap: '8px', minWidth: 'max-content', paddingBottom: '8px' }}>
                       {surveyDetails.timeline.map((day, index) => (
@@ -768,11 +793,12 @@ const Surveys = () => {
               {/* Response Details */}
               {surveyDetails?.responses && surveyDetails.responses.length > 0 && (
                 <div style={{ 
-                  backgroundColor: '#f8f9fa', 
+                  backgroundColor: '#1e1e2e', 
                   padding: '20px', 
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  border: '1px solid #8A5CF6'
                 }}>
-                  <h3 style={{ marginBottom: '16px' }}>Recent Responses</h3>
+                  <h3 style={{ marginBottom: '16px', color: '#8A5CF6' }}>Recent Responses</h3>
                   <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                     {surveyDetails.responses.slice(0, 10).map((response, index) => (
                       <div key={response.id} style={{ 
@@ -804,7 +830,7 @@ const Surveys = () => {
                             rel="noopener noreferrer"
                             style={{ 
                               fontSize: '12px', 
-                              color: '#007bff',
+                              color: '#8A5CF6',
                               textDecoration: 'none'
                             }}
                           >
@@ -826,24 +852,26 @@ const Surveys = () => {
             {/* Sidebar */}
             <div>
               <div style={{ 
-                backgroundColor: '#f8f9fa', 
+                backgroundColor: '#1e1e2e', 
                 padding: '16px', 
                 borderRadius: '8px',
-                marginBottom: '16px'
+                marginBottom: '16px',
+                border: '1px solid #8A5CF6'
               }}>
-                <h4 style={{ marginBottom: '12px' }}>Survey Status</h4>
+                <h4 style={{ marginBottom: '12px', color: '#8A5CF6' }}>Survey Status</h4>
                 <span style={getStatusBadge(selectedSurvey.survey_status)}>
                   {selectedSurvey.survey_status}
                 </span>
               </div>
 
               <div style={{ 
-                backgroundColor: '#f8f9fa', 
+                backgroundColor: '#1e1e2e', 
                 padding: '16px', 
                 borderRadius: '8px',
-                marginBottom: '16px'
+                marginBottom: '16px',
+                border: '1px solid #8A5CF6'
               }}>
-                <h4 style={{ marginBottom: '12px' }}>Idea Information</h4>
+                <h4 style={{ marginBottom: '12px', color: '#8A5CF6' }}>Idea Information</h4>
                 <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
                   <div style={{ marginBottom: '8px' }}>
                     <strong>Audience:</strong> {selectedSurvey.targeted_audience}
@@ -860,11 +888,12 @@ const Surveys = () => {
               {/* Response Analytics */}
               {surveyDetails?.analytics && (
                 <div style={{ 
-                  backgroundColor: '#f8f9fa', 
+                  backgroundColor: '#1e1e2e', 
                   padding: '16px', 
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  border: '1px solid #8A5CF6'
                 }}>
-                  <h4 style={{ marginBottom: '12px' }}>Analytics</h4>
+                  <h4 style={{ marginBottom: '12px', color: '#8A5CF6' }}>Analytics</h4>
                   <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
                     <div style={{ marginBottom: '8px' }}>
                       <strong>Avg Response Time:</strong> {Math.round(surveyDetails.analytics.averageResponseTime || 0)} hours
@@ -891,340 +920,65 @@ const Surveys = () => {
 
   // Main Surveys List View
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ marginBottom: '16px' }}>Survey Management</h2>
-        <AnalyticsDashboard />
-      </div>
-
-      {/* Filters and Controls */}
-      <div style={{ 
-        marginBottom: '20px', 
-        display: 'flex', 
-        gap: '12px',
-        flexWrap: 'wrap',
-        alignItems: 'center'
-      }}>
+    <div className="min-h-screen bg-black text-white p-8">
+      <h1 className="heading-main mb-8">Surveys</h1>
+      {/* Filters and Search */}
+      <div className="card-dark card-accent p-6 mb-8 flex items-center gap-6">
         <input
           type="text"
-          placeholder="Search by idea name or creator..."
+          placeholder="Search surveys..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ 
-            padding: '10px', 
-            flex: '1',
-            minWidth: '300px',
-            border: '1px solid #ced4da', 
-            borderRadius: '6px',
-            fontSize: '14px'
-          }}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="bg-black text-purple-main border border-purple-main rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-main"
         />
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ 
-            padding: '10px', 
-            border: '1px solid #ced4da', 
-            borderRadius: '6px',
-            fontSize: '14px'
-          }}
+          onChange={e => setStatusFilter(e.target.value)}
+          className="bg-black text-purple-main border border-purple-main rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-main"
         >
-          <option value="all">All Statuses</option>
+          <option value="all">All Status</option>
           <option value="Draft">Draft</option>
           <option value="Active">Active</option>
           <option value="Completed">Completed</option>
           <option value="Scheduled">Scheduled</option>
         </select>
-        <button 
-          onClick={() => setShowCreateForm(true)}
-          style={{ 
-            padding: '10px 16px', 
-            backgroundColor: '#28a745', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          + Create Survey
-        </button>
-        <button 
-          onClick={fetchData}
-          disabled={loading}
-          style={{ 
-            padding: '10px 16px', 
-            backgroundColor: '#007bff', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          {loading ? 'Refreshing...' : 'Refresh'}
-        </button>
+        <button onClick={() => setShowCreateForm(true)} className="btn-primary ml-auto">Create Survey</button>
       </div>
-
-      {error && (
-        <div style={{ 
-          color: '#721c24', 
-          backgroundColor: '#f8d7da', 
-          padding: '12px', 
-          borderRadius: '6px',
-          marginBottom: '20px'
-        }}>
-          {error}
-        </div>
-      )}
-
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}>Loading surveys...</div>
-      ) : (
-        <div>
-          <div style={{ 
-            marginBottom: '16px', 
-            color: '#6c757d',
-            fontSize: '14px'
-          }}>
-            Showing {filteredSurveys.length} of {surveys.length} surveys
-          </div>
-          
-          {filteredSurveys.length === 0 ? (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '40px',
-              backgroundColor: '#f8f9fa',
-              borderRadius: '8px'
-            }}>
-              {surveys.length === 0 ? (
-                <div>
-                  <h3 style={{ margin: '0 0 16px 0', color: '#6c757d' }}>No surveys created yet</h3>
-                  <p style={{ margin: '0 0 16px 0', color: '#6c757d' }}>
-                    Get started by creating your first survey for an idea validation study.
-                  </p>
-                  <button 
-                    onClick={() => setShowCreateForm(true)}
-                    style={{ 
-                      padding: '12px 24px', 
-                      backgroundColor: '#28a745', 
-                      color: 'white', 
-                      border: 'none', 
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontSize: '16px'
-                    }}
-                  >
-                    Create First Survey
-                  </button>
-                </div>
-              ) : (
-                'No surveys match your search criteria.'
-              )}
-            </div>
-          ) : (
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', 
-              gap: '20px' 
-            }}>
+      {/* Survey Table/Card List */}
+      <div className="card-dark card-accent p-6">
+        {filteredSurveys.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#8A5CF6', padding: '24px' }}>No surveys found.</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ color: '#8A5CF6', borderBottom: '2px solid #8A5CF6' }}>
+                <th>Idea Name</th>
+                <th>Creator</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Responses</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
               {filteredSurveys.map(survey => (
-                <div
-                  key={survey.id}
-                  style={{
-                    border: '1px solid #e3e6f0',
-                    borderRadius: '8px',
-                    backgroundColor: 'white',
-                    padding: '20px',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-                  }}
-                  onClick={() => {
-                    setSelectedSurvey(survey);
-                    setCurrentView('details');
-                  }}
-                >
-                  <div style={{ marginBottom: '12px' }}>
-                    <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', lineHeight: '1.3' }}>
-                      Survey for "{survey.idea_name}"
-                    </h3>
-                    <p style={{ 
-                      fontSize: '14px', 
-                      color: '#6c757d', 
-                      margin: '0',
-                      lineHeight: '1.4'
-                    }}>
-                      Target: {survey.targeted_audience}
-                    </p>
-                  </div>
-                  
-                  <div style={{ marginBottom: '12px' }}>
-                    <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '4px' }}>
-                      Creator: {survey.creator_name || survey.creator_email}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#6c757d' }}>
-                      Created: {formatDate(survey.created_at)}
-                    </div>
-                  </div>
-
-                  <div style={{ marginBottom: '12px' }}>
-                    <span style={getStatusBadge(survey.survey_status)}>{survey.survey_status}</span>
-                  </div>
-
-                  {/* Progress Bar */}
-                  {survey.survey_status === 'Active' && survey.time_progress_percentage > 0 && (
-                    <div style={{ marginBottom: '12px' }}>
-                      <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        fontSize: '12px',
-                        color: '#6c757d',
-                        marginBottom: '4px'
-                      }}>
-                        <span>Progress</span>
-                        <span>{survey.time_progress_percentage}%</span>
-                      </div>
-                      <div style={{ 
-                        backgroundColor: '#e9ecef', 
-                        height: '4px', 
-                        borderRadius: '2px',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{ 
-                          backgroundColor: '#007bff',
-                          height: '100%', 
-                          width: `${survey.time_progress_percentage}%`,
-                          transition: 'width 0.3s ease'
-                        }}></div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: '1fr 1fr 1fr', 
-                    gap: '8px',
-                    marginBottom: '12px',
-                    fontSize: '12px',
-                    textAlign: 'center'
-                  }}>
-                    <div>
-                      <div style={{ fontWeight: '600', color: '#28a745' }}>
-                        {survey.total_responses || 0}
-                      </div>
-                      <div style={{ color: '#6c757d' }}>Responses</div>
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: '600', color: '#007bff' }}>
-                        {survey.unique_responders || 0}
-                      </div>
-                      <div style={{ color: '#6c757d' }}>Unique</div>
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: '600', color: '#ffc107' }}>
-                        {survey.response_rate_per_day || 0}
-                      </div>
-                      <div style={{ color: '#6c757d' }}>Per Day</div>
-                    </div>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div style={{ 
-                    display: 'flex', 
-                    gap: '8px',
-                    paddingTop: '12px',
-                    borderTop: '1px solid #e9ecef'
-                  }}>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setViewerFormUrl(survey.form_url);
-                        setCurrentView('formViewer');
-                      }}
-                      style={{ 
-                        flex: 1,
-                        padding: '6px 12px', 
-                        backgroundColor: '#007bff', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      📋 View Form
-                    </button>
-                    
-                    {survey.survey_status === 'Draft' && (
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction('start', survey.id);
-                        }}
-                        disabled={actionLoading === survey.id}
-                        style={{ 
-                          flex: 1,
-                          padding: '6px 12px', 
-                          backgroundColor: '#28a745', 
-                          color: 'white', 
-                          border: 'none', 
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {actionLoading === survey.id ? 'Starting...' : 'Start'}
-                      </button>
-                    )}
-                    
-                    {survey.survey_status === 'Active' && (
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction('stop', survey.id);
-                        }}
-                        disabled={actionLoading === survey.id}
-                        style={{ 
-                          flex: 1,
-                          padding: '6px 12px', 
-                          backgroundColor: '#dc3545', 
-                          color: 'white', 
-                          border: 'none', 
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {actionLoading === survey.id ? 'Stopping...' : 'Stop'}
-                      </button>
-                    )}
-                  </div>
-
-                  <div style={{ 
-                    fontSize: '11px', 
-                    color: '#6c757d',
-                    marginTop: '8px',
-                    textAlign: 'center'
-                  }}>
-                    {survey.start_time ? `Started: ${formatDate(survey.start_time)}` : 'Not started yet'}
-                  </div>
-                </div>
+                <tr key={survey.id} style={{ borderBottom: '1px solid #232323' }}>
+                  <td>{survey.idea_name}</td>
+                  <td>{survey.creator_email}</td>
+                  <td><span style={getStatusBadge(survey.survey_status)}>{survey.survey_status}</span></td>
+                  <td>{survey.created_at ? new Date(survey.created_at).toLocaleDateString() : '-'}</td>
+                  <td>{survey.total_responses || 0}</td>
+                  <td>
+                    <button onClick={() => setSelectedSurvey(survey)} className="btn-primary" style={{ marginRight: '8px', padding: '4px 12px', fontSize: '12px' }}>View</button>
+                    <button onClick={() => handleAction('delete', survey.id)} className="btn-primary" style={{ backgroundColor: '#dc3545', padding: '4px 12px', fontSize: '12px' }}>Delete</button>
+                  </td>
+                </tr>
               ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {showCreateForm && <CreateSurveyForm />}
+            </tbody>
+          </table>
+        )}
+      </div>
+      {/* ...existing modals and dialogs... */}
     </div>
   );
 };

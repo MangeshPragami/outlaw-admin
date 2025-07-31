@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { getUsersOverview, getAllUsers, setUserAdminVerified, createUser, updateUser, deleteUser } from '../services/api';
+import './UserManagement.css';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -206,310 +207,116 @@ const UserManagement = () => {
   }
 
   return (
-    <div style={{ padding: '20px', height: '100%' }}>
-      {/* Add User Button */}
-      <button
-        onClick={() => setShowAddModal(true)}
-        style={{ marginBottom: '20px', padding: '10px 16px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '500' }}
-      >
-        ➕ Add User
-      </button>
-
-      {/* Add User Modal */}
-      {showAddModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', padding: '30px', borderRadius: '8px', minWidth: '350px' }}>
-            <h2>Add User</h2>
-            {/* Simple form for user fields */}
-            <input type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <input type="text" placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <input type="text" placeholder="Temp ID" value={formData.temp_id} onChange={e => setFormData({ ...formData, temp_id: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <input type="text" placeholder="Auth Type" value={formData.auth_type} onChange={e => setFormData({ ...formData, auth_type: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <input type="text" placeholder="Persona Type" value={formData.persona_type} onChange={e => setFormData({ ...formData, persona_type: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <button onClick={handleAddUser} style={{ background: '#28a745', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', marginRight: '10px' }}>Add</button>
-            <button onClick={() => setShowAddModal(false)} style={{ background: '#dc3545', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px' }}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {/* Edit User Modal */}
-      {showEditModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'white', padding: '30px', borderRadius: '8px', minWidth: '350px' }}>
-            <h2>Edit User</h2>
-            <input type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <input type="text" placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <input type="text" placeholder="Temp ID" value={formData.temp_id} onChange={e => setFormData({ ...formData, temp_id: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <input type="text" placeholder="Auth Type" value={formData.auth_type} onChange={e => setFormData({ ...formData, auth_type: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <input type="text" placeholder="Persona Type" value={formData.persona_type} onChange={e => setFormData({ ...formData, persona_type: e.target.value })} style={{ width: '100%', marginBottom: '10px' }} />
-            <button onClick={handleEditUser} style={{ background: '#007bff', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', marginRight: '10px' }}>Save</button>
-            <button onClick={() => setShowEditModal(false)} style={{ background: '#dc3545', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px' }}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>
-      )}
-      <div style={{ marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '600', color: '#495057', marginBottom: '8px' }}>
-          👥 User Management
-        </h1>
-        <p style={{ color: '#6c757d', fontSize: '14px' }}>
-          Manage user accounts, approvals, and access controls
-        </p>
-      </div>
-
+    <div className="min-h-screen bg-black text-white p-8">
+      <h1 className="heading-main mb-8">User Management</h1>
       {/* Filters and Search */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        border: '1px solid #e3e6f0',
-        padding: '20px',
-        marginBottom: '20px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-      }}>
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
-          {/* Search */}
-          <input
-            type="text"
-            placeholder="Search by email, name, or persona type..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              flex: 1,
-              minWidth: '250px',
-              padding: '10px 12px',
-              border: '1px solid #ced4da',
-              borderRadius: '6px',
-              fontSize: '14px',
-              outline: 'none'
-            }}
-          />
-
-          {/* Filter Dropdown */}
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            style={{
-              padding: '10px 12px',
-              border: '1px solid #ced4da',
-              borderRadius: '6px',
-              fontSize: '14px',
-              minWidth: '150px'
-            }}
-          >
-            <option value="all">All Users</option>
-            <option value="verified">✅ Approved Users</option>
-            <option value="unverified">⏳ Pending Approval</option>
-          </select>
-
-          {/* Bulk Actions */}
-          {selectedUsers.length > 0 && (
-            <button
-              onClick={handleBulkApprove}
-              style={{
-                padding: '10px 16px',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
-            >
-              Approve Selected ({selectedUsers.length})
-            </button>
-          )}
-
-          <button
-            onClick={loadUsers}
-            disabled={loading}
-            style={{
-              padding: '10px 16px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            🔄 {loading ? 'Loading...' : 'Refresh'}
-          </button>
-        </div>
+      <div className="card-dark card-accent p-6 mb-8 flex items-center gap-6">
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="bg-black text-purple-main border border-purple-main rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-main"
+        />
+        <select
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          className="bg-black text-purple-main border border-purple-main rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-main"
+        >
+          <option value="all">All</option>
+          <option value="verified">Verified</option>
+          <option value="unverified">Unverified</option>
+        </select>
+        <button onClick={() => setShowAddModal(true)} className="btn-primary ml-auto">Add User</button>
       </div>
-
-      {/* Users Table */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        border: '1px solid #e3e6f0',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-      }}>
-        <div style={{
-          padding: '20px',
-          borderBottom: '1px solid #e3e6f0',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px 8px 0 0',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <h3 style={{ margin: 0, color: '#495057' }}>
-            Users ({filteredUsers.length})
-          </h3>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px' }}>
-              <input
-                type="checkbox"
-                checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-                onChange={selectAllUsers}
-              />
-              Select All
-            </label>
+      {/* User Table */}
+      <div className="card-dark card-accent p-6 overflow-x-auto rounded-xl">
+        <table className="w-full text-sm" style={{ minWidth: '700px', borderCollapse: 'separate', borderSpacing: '0' }}>
+          <thead>
+            <tr style={{ color: '#8A5CF6', borderBottom: '2px solid #8A5CF6', background: 'rgba(138,92,246,0.07)' }}>
+              <th style={{ padding: '12px 8px', textAlign: 'center' }}><input type="checkbox" checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0} onChange={selectAllUsers} /></th>
+              <th style={{ padding: '12px 8px' }}>Email</th>
+              <th style={{ padding: '12px 8px' }}>Persona Type</th>
+              <th style={{ padding: '12px 8px' }}>Verified</th>
+              <th style={{ padding: '12px 8px' }}>Created At</th>
+              <th style={{ padding: '12px 8px' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredUsers.length === 0 ? (
+              <tr><td colSpan={6} style={{ textAlign: 'center', color: '#8A5CF6', padding: '24px' }}>No users found.</td></tr>
+            ) : (
+              filteredUsers.map(user => (
+                <tr key={user.id} style={{ borderBottom: '1px solid #232323', background: user.verified_by_admin ? 'rgba(138,92,246,0.04)' : 'transparent' }}>
+                  <td style={{ textAlign: 'center', padding: '10px 8px' }}><input type="checkbox" checked={selectedUsers.includes(user.id)} onChange={() => handleSelectUser(user.id)} /></td>
+                  <td style={{ padding: '10px 8px' }}>{user.email}</td>
+                  <td style={{ padding: '10px 8px' }}><span style={getPersonaTypeBadge(user.persona_type)}>{user.persona_type}</span></td>
+                  <td style={{ padding: '10px 8px' }}><span style={getApprovalBadge(user.verified_by_admin)}>{user.verified_by_admin ? 'Verified' : 'Unverified'}</span></td>
+                  <td style={{ padding: '10px 8px' }}>{user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</td>
+                  <td style={{ padding: '10px 8px', minWidth: '180px' }}>
+                    {!user.verified_by_admin && (
+                      <button onClick={() => handleApproveUser(user.id)} className="btn-primary" style={{ marginRight: '8px', padding: '4px 12px', fontSize: '12px', minWidth: '70px' }}>Approve</button>
+                    )}
+                    {user.verified_by_admin && (
+                      <button onClick={() => handleRevokeApproval(user.id)} className="btn-primary" style={{ backgroundColor: '#dc3545', marginRight: '8px', padding: '4px 12px', fontSize: '12px', minWidth: '70px' }}>Revoke</button>
+                    )}
+                    <button onClick={() => { setEditUser(user); setShowEditModal(true); setFormData(user); }} className="btn-primary" style={{ backgroundColor: '#ffc107', color: '#212529', padding: '4px 12px', fontSize: '12px', minWidth: '70px' }}>Edit</button>
+                    <button onClick={() => handleDeleteUser(user.id)} className="btn-primary" style={{ backgroundColor: '#dc3545', marginLeft: '8px', padding: '4px 12px', fontSize: '12px', minWidth: '70px' }}>Delete</button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+        {selectedUsers.length > 0 && (
+          <div style={{ marginTop: '16px', textAlign: 'right' }}>
+            <button onClick={handleBulkApprove} className="btn-primary" style={{ padding: '8px 20px', fontWeight: '600', fontSize: '14px' }}>Bulk Approve Selected</button>
+          </div>
+        )}
+      </div>
+      {/* Add/Edit User Modals */}
+      {showAddModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: '#1e1e2e', padding: '32px', borderRadius: '16px', width: '400px', border: '1.5px solid #8A5CF6', boxShadow: '0 8px 32px 0 rgba(138,92,246,0.18)' }}>
+            <h3 style={{ marginTop: 0, color: '#8A5CF6', fontWeight: 700, fontSize: '1.3rem' }}>Add User</h3>
+            <form onSubmit={e => { e.preventDefault(); handleAddUser(); }}>
+              <input type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required style={{ width: '100%', marginBottom: '14px', padding: '10px', border: '1.5px solid #8A5CF6', borderRadius: '8px', backgroundColor: '#121212', color: 'white', fontSize: '1rem' }} />
+              <input type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} required style={{ width: '100%', marginBottom: '14px', padding: '10px', border: '1.5px solid #8A5CF6', borderRadius: '8px', backgroundColor: '#121212', color: 'white', fontSize: '1rem' }} />
+              <select value={formData.persona_type} onChange={e => setFormData({ ...formData, persona_type: e.target.value })} required style={{ width: '100%', marginBottom: '14px', padding: '10px', border: '1.5px solid #8A5CF6', borderRadius: '8px', backgroundColor: '#121212', color: 'white', fontSize: '1rem' }}>
+                <option value="">Select Persona Type</option>
+                <option value="founder">Founder</option>
+                <option value="sme">SME</option>
+                <option value="respondent">Respondent</option>
+              </select>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '18px' }}>
+                <button type="button" onClick={() => setShowAddModal(false)} style={{ padding: '8px 16px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                <button type="submit" className="btn-primary" style={{ padding: '8px 20px', fontWeight: 600 }}>Add</button>
+              </div>
+            </form>
           </div>
         </div>
-
-        <div style={{ padding: '20px' }}>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <div style={{ fontSize: '24px', marginBottom: '10px' }}>⏳</div>
-              <div>Loading users...</div>
-            </div>
-          ) : filteredUsers.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#6c757d', padding: '40px' }}>
-              No users found matching your criteria.
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {filteredUsers.map((user) => (
-                <div key={user.id} style={{ padding: '20px', border: '1px solid #e3e6f0', borderRadius: '8px', transition: 'box-shadow 0.3s ease' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div style={{ display: 'flex', gap: '15px', flex: 1 }}>
-                      {/* Selection Checkbox */}
-                      <input
-                        type="checkbox"
-                        checked={selectedUsers.includes(user.id)}
-                        onChange={() => handleSelectUser(user.id)}
-                        style={{ marginTop: '5px' }}
-                      />
-
-                      {/* User Info */}
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                          <h4 style={{ margin: 0, color: '#495057', fontSize: '16px' }}>
-                            {user.name || 'No Name Provided'}
-                          </h4>
-                          <span style={getPersonaTypeBadge(user.persona_type)}>
-                            {user.persona_type.replace('_', ' ')}
-                          </span>
-                          <span style={getApprovalBadge(user.verified_by_admin)}>
-                            {user.verified_by_admin ? '✅ APPROVED' : '⏳ PENDING'}
-                          </span>
-                        </div>
-
-                        <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '10px' }}>
-                          📧 {user.email}
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', fontSize: '13px', color: '#6c757d' }}>
-                          <span>{user.profile_title || 'No title'}</span>
-                          <span>🌍 {user.country || 'Not specified'}</span>
-                          <span>🏢 {user.industry || 'Not specified'}</span>
-                          <span>👤 {user.age ? `${user.age} years` : 'Age not provided'}</span>
-                        </div>
-
-                        {user.linkedin && (
-                          <div style={{ marginTop: '8px', fontSize: '13px' }}>
-                            🔗 <a href={user.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#007bff' }}>
-                              LinkedIn Profile
-                            </a>
-                          </div>
-                        )}
-
-                        <div style={{ marginTop: '8px', fontSize: '12px', color: '#6c757d' }}>
-                          📅 Joined: {new Date(user.created_at).toLocaleDateString()}
-                          {user.email_verified_at && (
-                            <span style={{ marginLeft: '15px' }}>
-                              ✅ Email verified: {new Date(user.email_verified_at).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                      {user.verified_by_admin ? (
-                        <button
-                          onClick={() => handleRevokeApproval(user.id)}
-                          style={{
-                            padding: '8px 12px',
-                            backgroundColor: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px'
-                          }}
-                        >
-                          Revoke Approval
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleApproveUser(user.id)}
-                          style={{
-                            padding: '8px 12px',
-                            backgroundColor: '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px'
-                          }}
-                        >
-                          ✅ Approve User
-                        </button>
-                      )}
-                      
-                      <button
-                        onClick={() => {
-                          setEditUser(user);
-                          setFormData({
-                            email: user.email,
-                            password: user.password,
-                            temp_id: user.temp_id,
-                            auth_type: user.auth_type,
-                            persona_type: user.persona_type,
-                            created_at: user.created_at,
-                            updated_at: user.updated_at,
-                            deleted_at: user.deleted_at,
-                            email_verified_at: user.email_verified_at,
-                            verified_by_admin: user.verified_by_admin
-                          });
-                          setShowEditModal(true);
-                        }}
-                        style={{ padding: '8px 12px', backgroundColor: '#ffc107', color: '#212529', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.id)}
-                        style={{ padding: '8px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
-                      >
-                        🗑️ Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+      )}
+      {showEditModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: '#1e1e2e', padding: '32px', borderRadius: '16px', width: '400px', border: '1.5px solid #8A5CF6', boxShadow: '0 8px 32px 0 rgba(138,92,246,0.18)' }}>
+            <h3 style={{ marginTop: 0, color: '#8A5CF6', fontWeight: 700, fontSize: '1.3rem' }}>Edit User</h3>
+            <form onSubmit={e => { e.preventDefault(); handleEditUser(); }}>
+              <input type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} required style={{ width: '100%', marginBottom: '14px', padding: '10px', border: '1.5px solid #8A5CF6', borderRadius: '8px', backgroundColor: '#121212', color: 'white', fontSize: '1rem' }} />
+              <input type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} style={{ width: '100%', marginBottom: '14px', padding: '10px', border: '1.5px solid #8A5CF6', borderRadius: '8px', backgroundColor: '#121212', color: 'white', fontSize: '1rem' }} />
+              <select value={formData.persona_type} onChange={e => setFormData({ ...formData, persona_type: e.target.value })} required style={{ width: '100%', marginBottom: '14px', padding: '10px', border: '1.5px solid #8A5CF6', borderRadius: '8px', backgroundColor: '#121212', color: 'white', fontSize: '1rem' }}>
+                <option value="">Select Persona Type</option>
+                <option value="founder">Founder</option>
+                <option value="sme">SME</option>
+                <option value="respondent">Respondent</option>
+              </select>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '18px' }}>
+                <button type="button" onClick={() => setShowEditModal(false)} style={{ padding: '8px 16px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                <button type="submit" className="btn-primary" style={{ padding: '8px 20px', fontWeight: 600 }}>Update</button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

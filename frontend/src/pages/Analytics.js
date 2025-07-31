@@ -14,7 +14,7 @@ const Analytics = () => {
   const { } = useContext(AuthContext);
 
   // Modern color palette
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F97316'];
+  const COLORS = ['#8A5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#06B6D4', '#84CC16', '#F97316'];
 
   // Load dashboard data
   const loadDashboardData = useCallback(async () => {
@@ -105,45 +105,38 @@ console.log('Length check:', usersOverview?.byPersonaType?.length);
   ];
 
   // Professional Metric Card Component
-  const MetricCard = ({ title, value, change, subtitle, trend, color = 'blue' }) => {
+  const MetricCard = ({ title, value, change, subtitle, trend, color = 'purple' }) => {
     const colorClasses = {
-      blue: 'from-blue-500 to-blue-600',
-      green: 'from-green-500 to-green-600',
-      purple: 'from-purple-500 to-purple-600',
-      orange: 'from-orange-500 to-orange-600',
-      red: 'from-red-500 to-red-600',
-      indigo: 'from-indigo-500 to-indigo-600'
+      purple: 'bg-purple-main',
+      blue: 'bg-gradient-to-r-purple',
+      green: 'bg-gradient-to-r from-green-500 to-green-600',
+      orange: 'bg-gradient-to-r from-orange-500 to-orange-600',
+      red: 'bg-gradient-to-r from-red-500 to-red-600',
+      indigo: 'bg-gradient-to-r from-indigo-500 to-indigo-600'
     };
-
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
+      <div className={`card-dark card-accent p-6 hover:shadow-purple transition-shadow duration-200`}>
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">{title}</p>
+            <p className="text-sm font-medium text-purple-main uppercase tracking-wide mb-2">{title}</p>
             <div className="flex items-baseline space-x-2">
-              <p className="text-3xl font-bold text-gray-900">{value || 0}</p>
+              <p className="text-3xl font-bold text-white">{value || 0}</p>
               {change && (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  change >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {change >= 0 ? '↗' : '↘'} {Math.abs(change)}%
-                </span>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${change >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{change >= 0 ? '↗' : '↘'} {Math.abs(change)}%</span>
               )}
             </div>
             {subtitle && (
-              <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+              <p className="text-sm text-gray-400 mt-1">{subtitle}</p>
             )}
           </div>
-          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center shadow-lg`}>
-            <div className="w-6 h-6 bg-white rounded opacity-90"></div>
+          <div className={`w-12 h-12 rounded-xl ${colorClasses[color]} flex items-center justify-center shadow-purple`}>
+            <div className="w-6 h-6 bg-purple-main rounded opacity-90"></div>
           </div>
         </div>
         {trend && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <div className="flex items-center text-sm text-gray-600">
-              <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                trend > 0 ? 'bg-green-400' : trend < 0 ? 'bg-red-400' : 'bg-gray-400'
-              }`}></span>
+          <div className="mt-4 pt-4 border-t border-purple-main">
+            <div className="flex items-center text-sm text-gray-400">
+              <span className={`inline-block w-2 h-2 rounded-full mr-2 ${trend > 0 ? 'bg-green-400' : trend < 0 ? 'bg-red-400' : 'bg-gray-400'}`}></span>
               Trending {trend > 0 ? 'up' : trend < 0 ? 'down' : 'stable'} this period
             </div>
           </div>
@@ -154,10 +147,10 @@ console.log('Length check:', usersOverview?.byPersonaType?.length);
 
   // Chart wrapper component
   const ChartCard = ({ title, children, className = "", fullWidth = false }) => (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 ${fullWidth ? 'col-span-full' : ''} ${className}`}>
+    <div className={`card-dark card-accent p-6 hover:shadow-purple transition-shadow duration-200 ${fullWidth ? 'col-span-full' : ''} ${className}`}>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+        <h3 className="heading-main">{title}</h3>
+        <div className="w-2 h-2 bg-purple-main rounded-full"></div>
       </div>
       <div className="h-80">
         {children}
@@ -184,20 +177,20 @@ console.log('Length check:', usersOverview?.byPersonaType?.length);
   // Error display
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl border border-red-200 max-w-md w-full p-8">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="card-dark card-accent max-w-md w-full p-8">
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <div className="w-8 h-8 bg-red-500 rounded"></div>
+            <div className="w-16 h-16 mx-auto bg-purple-main rounded-full flex items-center justify-center mb-4">
+              <div className="w-8 h-8 bg-black rounded"></div>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Connection Error</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <h2 className="text-xl font-semibold text-purple-main mb-2">Connection Error</h2>
+            <p className="text-gray-400 mb-4">{error}</p>
             <p className="text-sm text-gray-500 mb-6">
               Make sure your backend server is running on http://localhost:3001
             </p>
             <button
               onClick={loadDashboardData}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg"
+              className="btn-primary w-full"
             >
               Retry Connection
             </button>
@@ -647,25 +640,22 @@ console.log('Length check:', usersOverview?.byPersonaType?.length);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen bg-black">
       {/* Professional Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-black shadow-sm border-b border-purple-main">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-8">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Analytics Dashboard
-              </h1>
-              <p className="text-lg text-gray-600 mt-2">Monitor your platform performance and user engagement</p>
+              <h1 className="heading-main bg-clip-text text-transparent">Analytics Dashboard</h1>
+              <p className="text-lg text-gray-400 mt-2">Monitor your platform performance and user engagement</p>
             </div>
-            
             {/* Period Selector */}
             <div className="flex items-center space-x-4">
-              <label className="text-sm font-medium text-gray-700">Time Period:</label>
+              <label className="text-sm font-medium text-purple-main">Time Period:</label>
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-w-[140px]"
+                className="border border-purple-main rounded-lg px-4 py-2 bg-black text-purple-main focus:outline-none focus:ring-2 focus:ring-purple-main focus:border-transparent shadow-sm min-w-[140px]"
               >
                 {periods.map(p => (
                   <option key={p.value} value={p.value}>{p.label}</option>
@@ -673,18 +663,13 @@ console.log('Length check:', usersOverview?.byPersonaType?.length);
               </select>
             </div>
           </div>
-          
           {/* Modern Tab Navigation */}
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-0">
+          <div className="flex space-x-1 bg-black p-1 rounded-lg mb-0">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium text-sm transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
-                }`}
+                className={`flex-1 flex items-center justify-center py-3 px-4 rounded-md font-medium text-sm transition-all duration-200 ${activeTab === tab.id ? 'bg-purple-main text-white shadow-purple' : 'text-purple-main hover:text-white hover:bg-black'}`}
               >
                 <span className="mr-2 text-base">{tab.icon}</span>
                 {tab.label}
@@ -699,8 +684,8 @@ console.log('Length check:', usersOverview?.byPersonaType?.length);
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent absolute top-0 left-0"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-main"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-black border-t-transparent absolute top-0 left-0"></div>
             </div>
           </div>
         ) : (
@@ -711,26 +696,20 @@ console.log('Length check:', usersOverview?.byPersonaType?.length);
       </div>
 
       {/* Professional Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
+      <footer className="bg-black border-t border-purple-main mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center space-x-6">
-              <span className="flex items-center">
-                <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-                Real-time data
-              </span>
+              <span className="flex items-center"><span className="w-2 h-2 bg-purple-main rounded-full mr-2 animate-pulse"></span>Real-time data</span>
               <span>Last updated: {new Date().toLocaleTimeString()}</span>
             </div>
             <div className="flex items-center space-x-6">
-              <span>Analytics Dashboard v2.0</span>
-              <span>PostgreSQL Connected</span>
+              <span className="text-purple-main">Analytics Dashboard v2.0</span>
+              <span className="text-purple-main">PostgreSQL Connected</span>
             </div>
           </div>
         </div>
       </footer>
-
-      
-      
     </div>
   );
 };

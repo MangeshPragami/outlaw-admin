@@ -441,43 +441,21 @@ const IdeasStudies = () => {
 
   // Main Ideas List View
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ marginBottom: '16px' }}>Ideas & Studies Management</h2>
-        <AnalyticsDashboard />
-      </div>
-
-      {/* Filters */}
-      <div style={{ 
-        marginBottom: '20px', 
-        display: 'flex', 
-        gap: '12px',
-        flexWrap: 'wrap',
-        alignItems: 'center'
-      }}>
+    <div className="min-h-screen bg-black text-white p-8">
+      <h1 className="heading-main mb-8">Ideas & Studies</h1>
+      {/* Filters and Search */}
+      <div className="card-dark card-accent p-6 mb-8 flex items-center gap-6">
         <input
           type="text"
-          placeholder="Search ideas by name, description, or audience..."
+          placeholder="Search ideas..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ 
-            padding: '10px', 
-            flex: '1',
-            minWidth: '300px',
-            border: '1px solid #ced4da', 
-            borderRadius: '6px',
-            fontSize: '14px'
-          }}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="bg-black text-purple-main border border-purple-main rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-main"
         />
         <select
           value={selectedStage}
-          onChange={(e) => setSelectedStage(e.target.value)}
-          style={{ 
-            padding: '10px', 
-            border: '1px solid #ced4da', 
-            borderRadius: '6px',
-            fontSize: '14px'
-          }}
+          onChange={e => setSelectedStage(e.target.value)}
+          className="bg-black text-purple-main border border-purple-main rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-main"
         >
           <option value="all">All Stages</option>
           <option value="Starting">Starting</option>
@@ -485,254 +463,229 @@ const IdeasStudies = () => {
           <option value="Completed">Completed</option>
           <option value="Inactive">Inactive</option>
         </select>
-        <button 
-          onClick={fetchData}
-          disabled={loading}
-          style={{ 
-            padding: '10px 16px', 
-            backgroundColor: '#007bff', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          {loading ? 'Refreshing...' : 'Refresh'}
-        </button>
       </div>
-
-      {error && (
-        <div style={{ 
-          color: '#721c24', 
-          backgroundColor: '#f8d7da', 
-          padding: '12px', 
-          borderRadius: '6px',
-          marginBottom: '20px'
-        }}>
-          {error}
-        </div>
-      )}
-
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}>Loading ideas...</div>
-      ) : (
-        <div>
-          <div style={{ 
-            marginBottom: '16px', 
-            color: '#6c757d',
-            fontSize: '14px'
-          }}>
-            Showing {filteredIdeas.length} of {ideas.length} ideas
-          </div>
-          
-          {filteredIdeas.length === 0 ? (
+      {/* Ideas Table/Card List */}
+      <div className="card-dark card-accent p-6">
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>Loading ideas...</div>
+        ) : (
+          <div>
             <div style={{ 
-              textAlign: 'center', 
-              padding: '40px',
-              backgroundColor: '#f8f9fa',
-              borderRadius: '8px'
+              marginBottom: '16px', 
+              color: '#6c757d',
+              fontSize: '14px'
             }}>
-              No ideas found matching your criteria.
+              Showing {filteredIdeas.length} of {ideas.length} ideas
             </div>
-          ) : (
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', 
-              gap: '20px' 
-            }}>
-              {filteredIdeas.map(idea => {
-                const progress = getLensProgress(idea);
-                
-                return (
-                  <div
-                    key={idea.id}
-                    style={{
-                      border: '1px solid #e3e6f0',
-                      borderRadius: '8px',
-                      backgroundColor: 'white',
-                      padding: '20px',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                      transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-                    }}
-                    onClick={() => setSelectedIdea(idea)}
-                  >
-                    <div style={{ marginBottom: '12px' }}>
-                      <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', lineHeight: '1.3' }}>
-                        {idea.name}
-                      </h3>
-                      <p style={{ 
-                        fontSize: '14px', 
-                        color: '#6c757d', 
-                        margin: '0',
-                        lineHeight: '1.4',
-                        overflow: 'hidden',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical'
-                      }}>
-                        {idea.description}
-                      </p>
-                    </div>
-                    
-                    <div style={{ marginBottom: '12px' }}>
-                      <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '4px' }}>
-                        Creator: {idea.creator_name || idea.creator_email}
+            
+            {filteredIdeas.length === 0 ? (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: '40px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '8px'
+              }}>
+                No ideas found matching your criteria.
+              </div>
+            ) : (
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', 
+                gap: '20px' 
+              }}>
+                {filteredIdeas.map(idea => {
+                  const progress = getLensProgress(idea);
+                  
+                  return (
+                    <div
+                      key={idea.id}
+                      style={{
+                        border: '1px solid #e3e6f0',
+                        borderRadius: '8px',
+                        backgroundColor: 'white',
+                        padding: '20px',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                      }}
+                      onClick={() => setSelectedIdea(idea)}
+                    >
+                      <div style={{ marginBottom: '12px' }}>
+                        <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', lineHeight: '1.3' }}>
+                          {idea.name}
+                        </h3>
+                        <p style={{ 
+                          fontSize: '14px', 
+                          color: '#6c757d', 
+                          margin: '0',
+                          lineHeight: '1.4',
+                          overflow: 'hidden',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical'
+                        }}>
+                          {idea.description}
+                        </p>
                       </div>
-                      <div style={{ fontSize: '12px', color: '#6c757d' }}>
-                        Target: {idea.targeted_audience}
+                      
+                      <div style={{ marginBottom: '12px' }}>
+                        <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '4px' }}>
+                          Creator: {idea.creator_name || idea.creator_email}
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#6c757d' }}>
+                          Target: {idea.targeted_audience}
+                        </div>
                       </div>
-                    </div>
 
-                    <div style={{ marginBottom: '12px' }}>
-                      <span style={getStatusBadge(idea.stage)}>{idea.stage}</span>
-                    </div>
+                      <div style={{ marginBottom: '12px' }}>
+                        <span style={getStatusBadge(idea.stage)}>{idea.stage}</span>
+                      </div>
 
-                    {/* Study Progress Bar */}
-                    <div style={{ marginBottom: '12px' }}>
+                      {/* Study Progress Bar */}
+                      <div style={{ marginBottom: '12px' }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          fontSize: '12px',
+                          color: '#6c757d',
+                          marginBottom: '4px'
+                        }}>
+                          <span>Study Progress</span>
+                          <span>{progress.completed}/4 Lenses</span>
+                        </div>
+                        <div style={{ 
+                          backgroundColor: '#e9ecef', 
+                          height: '6px', 
+                          borderRadius: '3px',
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{ 
+                            backgroundColor: progress.percentage === 100 ? '#28a745' : 
+                                           progress.percentage >= 50 ? '#ffc107' : '#17a2b8',
+                            height: '100%', 
+                            width: `${progress.percentage}%`,
+                            transition: 'width 0.3s ease'
+                          }}></div>
+                        </div>
+                      </div>
+
+                      {/* Lens Status Icons */}
                       <div style={{ 
                         display: 'flex', 
-                        justifyContent: 'space-between', 
-                        fontSize: '12px',
-                        color: '#6c757d',
-                        marginBottom: '4px'
+                        justifyContent: 'space-between',
+                        marginBottom: '12px'
                       }}>
-                        <span>Study Progress</span>
-                        <span>{progress.completed}/4 Lenses</span>
+                        {[
+                          { name: 'SME', status: idea.sme_lens_status },
+                          { name: 'Survey', status: idea.survey_lens_status },
+                          { name: 'Social', status: idea.social_lens_status },
+                          { name: 'Peer', status: idea.peer_lens_status }
+                        ].map(lens => (
+                          <div key={lens.name} style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '16px' }}>
+                              {getLensStatusIcon(lens.status)}
+                            </div>
+                            <div style={{ fontSize: '10px', color: '#6c757d' }}>
+                              {lens.name}
+                            </div>
+                          </div>
+                        ))}
                       </div>
+
+                      {/* Quick Actions */}
                       <div style={{ 
-                        backgroundColor: '#e9ecef', 
-                        height: '6px', 
-                        borderRadius: '3px',
-                        overflow: 'hidden'
+                        display: 'flex', 
+                        gap: '8px',
+                        paddingTop: '12px',
+                        borderTop: '1px solid #e9ecef'
                       }}>
-                        <div style={{ 
-                          backgroundColor: progress.percentage === 100 ? '#28a745' : 
-                                         progress.percentage >= 50 ? '#ffc107' : '#17a2b8',
-                          height: '100%', 
-                          width: `${progress.percentage}%`,
-                          transition: 'width 0.3s ease'
-                        }}></div>
+                        {idea.stage === 'Inactive' ? (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAction('activate', idea.id);
+                            }}
+                            disabled={actionLoading === idea.id}
+                            style={{ 
+                              flex: 1,
+                              padding: '6px 12px', 
+                              backgroundColor: '#28a745', 
+                              color: 'white', 
+                              border: 'none', 
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {actionLoading === idea.id ? 'Loading...' : 'Activate'}
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAction('deactivate', idea.id);
+                            }}
+                            disabled={actionLoading === idea.id}
+                            style={{ 
+                              flex: 1,
+                              padding: '6px 12px', 
+                              backgroundColor: '#dc3545', 
+                              color: 'white', 
+                              border: 'none', 
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {actionLoading === idea.id ? 'Loading...' : 'Deactivate'}
+                          </button>
+                        )}
+                        
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAction('reset', idea.id);
+                          }}
+                          disabled={actionLoading === idea.id}
+                          style={{ 
+                            flex: 1,
+                            padding: '6px 12px', 
+                            backgroundColor: '#ffc107', 
+                            color: '#212529', 
+                            border: 'none', 
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Reset
+                        </button>
+                      </div>
+
+                      <div style={{ 
+                        fontSize: '11px', 
+                        color: '#6c757d',
+                        marginTop: '8px',
+                        textAlign: 'center'
+                      }}>
+                        {idea.total_responses || 0} responses • {idea.study_status}
                       </div>
                     </div>
-
-                    {/* Lens Status Icons */}
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      marginBottom: '12px'
-                    }}>
-                      {[
-                        { name: 'SME', status: idea.sme_lens_status },
-                        { name: 'Survey', status: idea.survey_lens_status },
-                        { name: 'Social', status: idea.social_lens_status },
-                        { name: 'Peer', status: idea.peer_lens_status }
-                      ].map(lens => (
-                        <div key={lens.name} style={{ textAlign: 'center' }}>
-                          <div style={{ fontSize: '16px' }}>
-                            {getLensStatusIcon(lens.status)}
-                          </div>
-                          <div style={{ fontSize: '10px', color: '#6c757d' }}>
-                            {lens.name}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div style={{ 
-                      display: 'flex', 
-                      gap: '8px',
-                      paddingTop: '12px',
-                      borderTop: '1px solid #e9ecef'
-                    }}>
-                      {idea.stage === 'Inactive' ? (
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAction('activate', idea.id);
-                          }}
-                          disabled={actionLoading === idea.id}
-                          style={{ 
-                            flex: 1,
-                            padding: '6px 12px', 
-                            backgroundColor: '#28a745', 
-                            color: 'white', 
-                            border: 'none', 
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {actionLoading === idea.id ? 'Loading...' : 'Activate'}
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAction('deactivate', idea.id);
-                          }}
-                          disabled={actionLoading === idea.id}
-                          style={{ 
-                            flex: 1,
-                            padding: '6px 12px', 
-                            backgroundColor: '#dc3545', 
-                            color: 'white', 
-                            border: 'none', 
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {actionLoading === idea.id ? 'Loading...' : 'Deactivate'}
-                        </button>
-                      )}
-                      
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction('reset', idea.id);
-                        }}
-                        disabled={actionLoading === idea.id}
-                        style={{ 
-                          flex: 1,
-                          padding: '6px 12px', 
-                          backgroundColor: '#ffc107', 
-                          color: '#212529', 
-                          border: 'none', 
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Reset
-                      </button>
-                    </div>
-
-                    <div style={{ 
-                      fontSize: '11px', 
-                      color: '#6c757d',
-                      marginTop: '8px',
-                      textAlign: 'center'
-                    }}>
-                      {idea.total_responses || 0} responses • {idea.study_status}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
