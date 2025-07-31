@@ -20,12 +20,13 @@ const UserManagement = () => {
     created_at: '', updated_at: '', deleted_at: '', email_verified_at: '', verified_by_admin: false
   });
 
-  // Load users from API
+  // Load users from API - Remove the search dependency to avoid multiple calls
   const loadUsers = useCallback(async () => {
+    if (!token) return; // Don't call API if no token
+    
     setLoading(true);
     setError('');
     try {
-      // You can use getAllUsers(token) for full list, or getUsersOverview(token) for summary
       const data = await getAllUsers(token);
       // Ensure verified_by_admin is always boolean
       setUsers(data.map(user => ({ ...user, verified_by_admin: !!user.verified_by_admin })));
@@ -34,23 +35,17 @@ const UserManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token]); // Remove searchTerm from dependencies
 
-  // Load users on component mount
+  // Load users on component mount and when token changes
   useEffect(() => {
-    loadUsers();
-  }, [loadUsers]);
-
-  // Debounced search effect
-  useEffect(() => {
-    if (!searchTerm) return; // Don't reload on initial empty search
-    
-    const timeoutId = setTimeout(() => {
+    if (token) {
       loadUsers();
-    }, 300); // Debounce search
+    }
+  }, [token, loadUsers]);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, loadUsers]);
+  // Remove the search effect that was causing multiple API calls
+  // Search will now be handled client-side only
 
   const handleApproveUser = async (userId) => {
     try {
@@ -128,6 +123,7 @@ const UserManagement = () => {
     }
   };
 
+  // Client-side filtering - no API calls needed
   const filteredUsers = users.filter(user => {
     // Filter by verification status
     if (filter === 'verified' && !user.verified_by_admin) return false;
@@ -203,6 +199,11 @@ const UserManagement = () => {
       setSelectedUsers(filteredUsers.map(user => user.id));
     }
   };
+
+  // Show loading if no token yet
+  if (!token) {
+    return <div style={{ padding: '20px' }}>Loading...</div>;
+  }
 
   return (
     <div style={{ padding: '20px', height: '100%' }}>
@@ -300,8 +301,8 @@ const UserManagement = () => {
             }}
           >
             <option value="all">All Users</option>
-            <option value="verified"> Approved Users</option>
-            <option value="unverified"> Pending Approval</option>
+            <option value="verified">✅ Approved Users</option>
+            <option value="unverified">⏳ Pending Approval</option>
           </select>
 
           {/* Bulk Actions */}
@@ -325,6 +326,7 @@ const UserManagement = () => {
 
           <button
             onClick={loadUsers}
+            disabled={loading}
             style={{
               padding: '10px 16px',
               backgroundColor: '#007bff',
@@ -335,7 +337,7 @@ const UserManagement = () => {
               fontSize: '14px'
             }}
           >
-            🔄 Refresh
+            🔄 {loading ? 'Loading...' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -405,7 +407,7 @@ const UserManagement = () => {
                             {user.persona_type.replace('_', ' ')}
                           </span>
                           <span style={getApprovalBadge(user.verified_by_admin)}>
-                            {user.verified_by_admin ? ' APPROVED' : ' PENDING'}
+                            {user.verified_by_admin ? '✅ APPROVED' : '⏳ PENDING'}
                           </span>
                         </div>
 
@@ -415,9 +417,9 @@ const UserManagement = () => {
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', fontSize: '13px', color: '#6c757d' }}>
                           <span>{user.profile_title || 'No title'}</span>
-                          <span> {user.country || 'Not specified'}</span>
-                          <span> {user.industry || 'Not specified'}</span>
-                          <span> {user.age ? `${user.age} years` : 'Age not provided'}</span>
+                          <span>🌍 {user.country || 'Not specified'}</span>
+                          <span>🏢 {user.industry || 'Not specified'}</span>
+                          <span>👤 {user.age ? `${user.age} years` : 'Age not provided'}</span>
                         </div>
 
                         {user.linkedin && (
@@ -429,10 +431,10 @@ const UserManagement = () => {
                         )}
 
                         <div style={{ marginTop: '8px', fontSize: '12px', color: '#6c757d' }}>
-                           Joined: {new Date(user.created_at).toLocaleDateString()}
+                          📅 Joined: {new Date(user.created_at).toLocaleDateString()}
                           {user.email_verified_at && (
                             <span style={{ marginLeft: '15px' }}>
-                               Email verified: {new Date(user.email_verified_at).toLocaleDateString()}
+                              ✅ Email verified: {new Date(user.email_verified_at).toLocaleDateString()}
                             </span>
                           )}
                         </div>

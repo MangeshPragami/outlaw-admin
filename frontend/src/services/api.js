@@ -178,8 +178,6 @@ export async function getDynamicLensSuggestions(token, ideaId) {
   return res.json();
 }
 
-// Add these to your src/services/api.js file:
-
 // ===== SURVEY/FORMS MANAGEMENT =====
 
 // Get all surveys with analytics
@@ -279,6 +277,7 @@ export async function getSurveysByIdea(token, ideaId) {
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch surveys for idea');
   return res.json();
 }
+
 // ===== SME =====
 export async function getSMEOverview(token) {
   const res = await fetch(`${API_BASE}/api/sme/overview`, {
@@ -294,5 +293,159 @@ export async function getAdminSettings(token) {
     headers: { Authorization: `Bearer ${token}` }
   });
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch settings');
+  return res.json();
+}
+
+// ===== SME MANAGEMENT APIs =====
+
+// Get all SME applications
+export async function getAllSMEApplications(token, filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.status) params.append('status', filters.status);
+  if (filters.industry) params.append('industry', filters.industry);
+  if (filters.experience) params.append('experience', filters.experience);
+  
+  const queryString = params.toString();
+  const url = `${API_BASE}/api/sme/applications${queryString ? `?${queryString}` : ''}`;
+  
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME applications');
+  return res.json();
+}
+
+// Approve SME application
+export async function approveSMEApplication(token, smeId, approvalData) {
+  const res = await fetch(`${API_BASE}/api/sme/${smeId}/approve`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(approvalData)
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to approve SME application');
+  return res.json();
+}
+
+// Reject SME application
+export async function rejectSMEApplication(token, smeId, rejectionData) {
+  const res = await fetch(`${API_BASE}/api/sme/${smeId}/reject`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(rejectionData)
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to reject SME application');
+  return res.json();
+}
+
+// Get SME profile details
+export async function getSMEProfile(token, smeId) {
+  const res = await fetch(`${API_BASE}/api/sme/${smeId}/profile`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME profile');
+  return res.json();
+}
+
+// Update SME profile
+export async function updateSMEProfile(token, smeId, profileData) {
+  const res = await fetch(`${API_BASE}/api/sme/${smeId}/profile`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(profileData)
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update SME profile');
+  return res.json();
+}
+
+// Get all approved SMEs
+export async function getAllApprovedSMEs(token, filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.expertise) params.append('expertise', filters.expertise);
+  if (filters.availability) params.append('availability', filters.availability);
+  if (filters.rating) params.append('rating', filters.rating);
+  
+  const queryString = params.toString();
+  const url = `${API_BASE}/api/sme/approved${queryString ? `?${queryString}` : ''}`;
+  
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch approved SMEs');
+  return res.json();
+}
+
+// Get SME efforts and duration tracking
+export async function getSMEEfforts(token, smeId, filters = {}) {
+  const params = new URLSearchParams();
+  if (filters.month) params.append('month', filters.month);
+  if (filters.year) params.append('year', filters.year);
+  
+  const queryString = params.toString();
+  const url = `${API_BASE}/api/sme/${smeId}/efforts${queryString ? `?${queryString}` : ''}`;
+  
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME efforts');
+  return res.json();
+}
+
+// Update SME effort record
+export async function updateSMEEffortRecord(token, effortId, effortData) {
+  const res = await fetch(`${API_BASE}/api/sme/efforts/${effortId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(effortData)
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update SME effort record');
+  return res.json();
+}
+
+// Get SME performance analytics
+export async function getSMEPerformanceAnalytics(token, smeId, period = '6months') {
+  const res = await fetch(`${API_BASE}/api/sme/${smeId}/analytics?period=${period}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME performance analytics');
+  return res.json();
+}
+
+// Suspend SME
+export async function suspendSME(token, smeId, suspensionData) {
+  const res = await fetch(`${API_BASE}/api/sme/${smeId}/suspend`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(suspensionData)
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to suspend SME');
+  return res.json();
+}
+
+// Reactivate SME
+export async function reactivateSME(token, smeId, reactivationData) {
+  const res = await fetch(`${API_BASE}/api/sme/${smeId}/reactivate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(reactivationData)
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to reactivate SME');
   return res.json();
 }
