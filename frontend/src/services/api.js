@@ -1,32 +1,27 @@
 // src/services/api.js
 import axios from 'axios';
 
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:3001';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:3001'; // Fallback port now matches .env
-
-
-// Create axios instance
+// Axios instance
 const api = axios.create({
-  baseURL: API_BASE, // Fixed variable name
+  baseURL: API_BASE,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor to add auth token if needed
+// Request interceptor for auth token
 api.interceptors.request.use(
   (config) => {
-    // Add auth token if available
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor for error handling
@@ -34,17 +29,27 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     console.error('API Error:', error.response?.data || error.message);
-    
-    // Handle 401 unauthorized
     if (error.response?.status === 401) {
       localStorage.removeItem('authToken');
-      // Redirect to login if needed
       // window.location.href = '/login';
     }
-    
     return Promise.reject(error);
   }
 );
+
+// Helper for fetch with auth
+async function fetchWithAuth(url, token, base = API_BASE, options = {}) {
+  const opts = {
+    headers: { Authorization: `Bearer ${token}` },
+    ...options,
+  };
+  if (opts.body && !opts.headers['Content-Type']) {
+    opts.headers['Content-Type'] = 'application/json';
+  }
+  const res = await fetch(`${base}/api${url}`, opts);
+  if (!res.ok) throw new Error((await res.json()).error || 'API request failed');
+  return res.json();
+}
 
 // ===== AUTHENTICATION =====
 export async function login(email, password) {
@@ -59,504 +64,259 @@ export async function login(email, password) {
 
 // ===== USERS =====
 export async function getUsersOverview(token) {
-  const res = await fetch(`${API_BASE}/api/users/overview`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch users overview');
-  return res.json();
+  return fetchWithAuth('/users/overview', token);
 }
 
 export async function getAllUsers(token) {
-  const res = await fetch(`${API_BASE}/api/users`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch users');
-  return res.json();
+  return fetchWithAuth('/users', token);
 }
 
 export async function createUser(token, userData) {
-  const res = await fetch(`${API_BASE}/api/users`, {
+  return fetchWithAuth('/users', token, API_BASE, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(userData)
+    body: JSON.stringify(userData),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to create user');
-  return res.json();
 }
 
 export async function updateUser(token, userId, userData) {
-  const res = await fetch(`${API_BASE}/api/users/${userId}`, {
+  return fetchWithAuth(`/users/${userId}`, token, API_BASE, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(userData)
+    body: JSON.stringify(userData),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update user');
-  return res.json();
 }
 
 export async function deleteUser(token, userId) {
-  const res = await fetch(`${API_BASE}/api/users/${userId}`, {
+  return fetchWithAuth(`/users/${userId}`, token, API_BASE, {
     method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
+    headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to delete user');
-  return res.json();
 }
 
 export async function setUserAdminVerified(token, userId, verified) {
-  const res = await fetch(`${API_BASE}/api/users/${userId}/verify`, {
+  return fetchWithAuth(`/users/${userId}/verify`, token, API_BASE, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ verified_by_admin: verified })
+    body: JSON.stringify({ verified_by_admin: verified }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update admin verification');
-  return res.json();
 }
 
-// ===== IDEAS - ORIGINAL ANALYTICS FUNCTIONS =====
+// ===== IDEAS =====
 export async function getIdeasOverview(token) {
-  const res = await fetch(`${API_BASE}/api/ideas/overview`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch ideas overview');
-  return res.json();
+  return fetchWithAuth('/ideas/overview', token);
 }
 
 export async function getIdeasTrends(token) {
-  const res = await fetch(`${API_BASE}/api/ideas/trends`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch ideas trends');
-  return res.json();
+  return fetchWithAuth('/ideas/trends', token);
 }
 
 export async function getIdeasValidation(token) {
-  const res = await fetch(`${API_BASE}/api/ideas/validation`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch ideas validation');
-  return res.json();
+  return fetchWithAuth('/ideas/validation', token);
 }
 
-// ===== IDEAS - NEW MANAGEMENT FUNCTIONS =====
 export async function getAllIdeas(token) {
-  const res = await fetch(`${API_BASE}/api/ideas`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch ideas');
-  return res.json();
+  return fetchWithAuth('/ideas', token);
 }
 
 export async function getIdeaById(token, ideaId) {
-  const res = await fetch(`${API_BASE}/api/ideas/${ideaId}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch idea details');
-  return res.json();
+  return fetchWithAuth(`/ideas/${ideaId}`, token);
 }
 
 export async function activateIdea(token, ideaId) {
-  const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/activate`, {
+  return fetchWithAuth(`/ideas/${ideaId}/activate`, token, API_BASE, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to activate idea');
-  return res.json();
 }
 
 export async function deactivateIdea(token, ideaId) {
-  const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/deactivate`, {
+  return fetchWithAuth(`/ideas/${ideaId}/deactivate`, token, API_BASE, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to deactivate idea');
-  return res.json();
 }
 
 export async function resetIdea(token, ideaId) {
-  const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/reset`, {
+  return fetchWithAuth(`/ideas/${ideaId}/reset`, token, API_BASE, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to reset idea');
-  return res.json();
 }
 
 export async function updateIdeaStage(token, ideaId, stage) {
-  const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/stage`, {
+  return fetchWithAuth(`/ideas/${ideaId}/stage`, token, API_BASE, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ stage })
+    body: JSON.stringify({ stage }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update idea stage');
-  return res.json();
 }
 
 export async function getStudyAnalytics(token) {
-  const res = await fetch(`${API_BASE}/api/ideas/analytics`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch study analytics');
-  return res.json();
+  return fetchWithAuth('/ideas/analytics', token);
 }
 
 // ===== DYNAMIC LENS SUGGESTIONS =====
 export async function getDynamicLensSuggestions(token, ideaId) {
-  const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/dynamic-lens-suggestions`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch dynamic lens suggestions');
-  return res.json();
+  return fetchWithAuth(`/ideas/${ideaId}/dynamic-lens-suggestions`, token);
 }
 
 // ===== SURVEY/FORMS MANAGEMENT =====
 export async function getAllSurveys(token) {
-  const res = await fetch(`${API_BASE}/api/forms`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch surveys');
-  return res.json();
+  return fetchWithAuth('/forms', token);
 }
 
 export async function getSurveyById(token, surveyId) {
-  const res = await fetch(`${API_BASE}/api/forms/${surveyId}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch survey details');
-  return res.json();
+  return fetchWithAuth(`/forms/${surveyId}`, token);
 }
 
 export async function createSurvey(token, surveyData) {
-  const res = await fetch(`${API_BASE}/api/forms`, {
+  return fetchWithAuth('/forms', token, API_BASE, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(surveyData)
+    body: JSON.stringify(surveyData),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to create survey');
-  return res.json();
 }
 
 export async function updateSurvey(token, surveyId, surveyData) {
-  const res = await fetch(`${API_BASE}/api/forms/${surveyId}`, {
+  return fetchWithAuth(`/forms/${surveyId}`, token, API_BASE, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(surveyData)
+    body: JSON.stringify(surveyData),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update survey');
-  return res.json();
 }
 
 export async function deleteSurvey(token, surveyId) {
-  const res = await fetch(`${API_BASE}/api/forms/${surveyId}`, {
+  return fetchWithAuth(`/forms/${surveyId}`, token, API_BASE, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to delete survey');
-  return res.json();
 }
 
 export async function startSurvey(token, surveyId, durationDays = null) {
-  const res = await fetch(`${API_BASE}/api/forms/${surveyId}/start`, {
+  return fetchWithAuth(`/forms/${surveyId}/start`, token, API_BASE, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ duration_days: durationDays })
+    body: JSON.stringify({ duration_days: durationDays }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to start survey');
-  return res.json();
 }
 
 export async function stopSurvey(token, surveyId) {
-  const res = await fetch(`${API_BASE}/api/forms/${surveyId}/stop`, {
+  return fetchWithAuth(`/forms/${surveyId}/stop`, token, API_BASE, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to stop survey');
-  return res.json();
 }
 
 export async function getSurveyAnalytics(token) {
-  const res = await fetch(`${API_BASE}/api/forms/analytics`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch survey analytics');
-  return res.json();
+  return fetchWithAuth('/forms/analytics', token);
 }
 
 export async function getSurveysByIdea(token, ideaId) {
-  const res = await fetch(`${API_BASE}/api/forms/idea/${ideaId}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch surveys for idea');
-  return res.json();
-}
-
-// ===== SME =====
-export async function getSMEOverview(token) {
-  const res = await fetch(`${API_BASE}/api/sme/overview`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME overview');
-  return res.json();
-}
-
-// ===== SETTINGS =====
-export async function getAdminSettings(token) {
-  const res = await fetch(`${API_BASE}/api/settings`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch settings');
-  return res.json();
+  return fetchWithAuth(`/forms/idea/${ideaId}`, token);
 }
 
 // ===== SME MANAGEMENT APIs =====
 
-// Get all SME applications
-export async function getAllSMEApplications(token, filters = {}) {
-  const params = new URLSearchParams();
-  if (filters.status) params.append('status', filters.status);
-  if (filters.industry) params.append('industry', filters.industry);
-  if (filters.experience) params.append('experience', filters.experience);
-  
-  const queryString = params.toString();
-  const url = `${API_BASE}/api/sme/applications${queryString ? `?${queryString}` : ''}`;
-  
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME applications');
-  return res.json();
+// SME Applications
+export async function getSMEApplications(token, status = 'pending') {
+  return fetchWithAuth(`/sme/applications?status=${status}`, token);
 }
 
-// Approve SME application
-export async function approveSMEApplication(token, smeId, approvalData) {
-  const res = await fetch(`${API_BASE}/api/sme/${smeId}/approve`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(approvalData)
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to approve SME application');
-  return res.json();
-}
-
-// Reject SME application
-export async function rejectSMEApplication(token, smeId, rejectionData) {
-  const res = await fetch(`${API_BASE}/api/sme/${smeId}/reject`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(rejectionData)
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to reject SME application');
-  return res.json();
-}
-
-// Get SME profile details
-export async function getSMEProfile(token, smeId) {
-  const res = await fetch(`${API_BASE}/api/sme/${smeId}/profile`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME profile');
-  return res.json();
-}
-
-// Update SME profile
-export async function updateSMEProfile(token, smeId, profileData) {
-  const res = await fetch(`${API_BASE}/api/sme/${smeId}/profile`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(profileData)
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update SME profile');
-  return res.json();
-}
-
-// Get all approved SMEs
-export async function getAllApprovedSMEs(token, filters = {}) {
-  const params = new URLSearchParams();
-  if (filters.expertise) params.append('expertise', filters.expertise);
-  if (filters.availability) params.append('availability', filters.availability);
-  if (filters.rating) params.append('rating', filters.rating);
-  
-  const queryString = params.toString();
-  const url = `${API_BASE}/api/sme/approved${queryString ? `?${queryString}` : ''}`;
-  
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch approved SMEs');
-  return res.json();
-}
-
-// Get SME efforts and duration tracking
-export async function getSMEEfforts(token, smeId, filters = {}) {
-  const params = new URLSearchParams();
-  if (filters.month) params.append('month', filters.month);
-  if (filters.year) params.append('year', filters.year);
-  
-  const queryString = params.toString();
-  const url = `${API_BASE}/api/sme/${smeId}/efforts${queryString ? `?${queryString}` : ''}`;
-  
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME efforts');
-  return res.json();
-}
-
-// Update SME effort record
-export async function updateSMEEffortRecord(token, effortId, effortData) {
-  const res = await fetch(`${API_BASE}/api/sme/efforts/${effortId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(effortData)
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update SME effort record');
-  return res.json();
-}
-
-// Get SME performance analytics
-export async function getSMEPerformanceAnalytics(token, smeId, period = '6months') {
-  const res = await fetch(`${API_BASE}/api/sme/${smeId}/analytics?period=${period}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch SME performance analytics');
-  return res.json();
-}
-
-// Suspend SME
-export async function suspendSME(token, smeId, suspensionData) {
-  const res = await fetch(`${API_BASE}/api/sme/${smeId}/suspend`, {
+export async function approveSMEApplication(token, id, reason) {
+  return fetchWithAuth(`/sme/applications/${id}/approve`, token, API_BASE, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(suspensionData)
+    body: JSON.stringify({ reason }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to suspend SME');
-  return res.json();
 }
 
-// Reactivate SME
-export async function reactivateSME(token, smeId, reactivationData) {
-  const res = await fetch(`${API_BASE}/api/sme/${smeId}/reactivate`, {
+export async function rejectSMEApplication(token, id, reason) {
+  return fetchWithAuth(`/sme/applications/${id}/reject`, token, API_BASE, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(reactivationData)
+    body: JSON.stringify({ reason }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to reactivate SME');
-  return res.json();
+}
+
+export async function bulkSMEAction(token, ids, action, reason) {
+  return fetchWithAuth(`/sme/applications/bulk-action`, token, API_BASE, {
+    method: 'POST',
+    body: JSON.stringify({ ids, action, reason }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+  });
+}
+
+// SME Profiles
+export async function getSMEProfiles(token) {
+  return fetchWithAuth('/sme/profiles', token);
+}
+
+export async function updateSMEProfile(token, id, data) {
+  return fetchWithAuth(`/sme/profiles/${id}`, token, API_BASE, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+  });
+}
+
+export async function updateSMEAvailability(token, id, available_time_slots) {
+  return fetchWithAuth(`/sme/profiles/${id}/availability`, token, API_BASE, {
+    method: 'POST',
+    body: JSON.stringify({ available_time_slots }),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+  });
+}
+
+// SME Efforts & Payout Tracking (Placeholder)
+export async function getSMEEfforts(token) {
+  // Placeholder endpoint
+  return fetchWithAuth('/sme/efforts', token);
+}
+
+// Chime Meeting Management (Placeholder)
+export async function getSMEMeetings(token) {
+  // Placeholder endpoint
+  return fetchWithAuth('/sme/meetings', token);
+}
+
+// ===== SETTINGS API =====
+export async function getAdminSettings(token) {
+  return fetchWithAuth('/settings', token);
 }
 
 // ===== ANALYTICS API FUNCTIONS =====
 export const analyticsAPI = {
-  // Health check
   health: () => fetch(`${API_BASE}/api/analytics/health`).then(res => res.json()),
-  
-  // User analytics
-  getUsersOverview: (period = 'all') => 
+  getUsersOverview: (period = 'all') =>
     fetch(`${API_BASE}/api/analytics/users/overview?period=${period}`).then(res => res.json()),
-  
-  getUsersGrowth: (period = '30') => 
+  getUsersGrowth: (period = '30') =>
     fetch(`${API_BASE}/api/analytics/users/growth?period=${period}`).then(res => res.json()),
-  
-  getUsersDemographics: () => 
+  getUsersDemographics: () =>
     fetch(`${API_BASE}/api/analytics/users/demographics`).then(res => res.json()),
-  
-  // Ideas analytics
-  getIdeasOverview: (period = 'all') => 
+  getIdeasOverview: (period = 'all') =>
     fetch(`${API_BASE}/api/analytics/ideas/overview?period=${period}`).then(res => res.json()),
-  
-  // Forms analytics
-  getFormsOverview: (period = 'all') => 
+  getFormsOverview: (period = 'all') =>
     fetch(`${API_BASE}/api/analytics/forms/overview?period=${period}`).then(res => res.json()),
-  
-  // SME analytics
-  getSMEOverview: (period = 'all') => 
+  getSMEOverview: (period = 'all') =>
     fetch(`${API_BASE}/api/analytics/sme/overview?period=${period}`).then(res => res.json()),
-  
-  // Bookings analytics
-  getBookingsOverview: (period = 'all') => 
+  getBookingsOverview: (period = 'all') =>
     fetch(`${API_BASE}/api/analytics/bookings/overview?period=${period}`).then(res => res.json()),
-  
-  // Chime analytics
-  getChimeOverview: (period = 'all') => 
+  getChimeOverview: (period = 'all') =>
     fetch(`${API_BASE}/api/analytics/chime/overview?period=${period}`).then(res => res.json()),
-  
-  getChimeTranscripts: (period = '30') => 
+  getChimeTranscripts: (period = '30') =>
     fetch(`${API_BASE}/api/analytics/chime/transcripts?period=${period}`).then(res => res.json()),
-  
-  // Engagement analytics
-  getEngagementFunnel: () => 
+  getEngagementFunnel: () =>
     fetch(`${API_BASE}/api/analytics/engagement/funnel`).then(res => res.json()),
-  
-  // Realtime analytics
-  getRealtime: () => 
+  getRealtime: () =>
     fetch(`${API_BASE}/api/analytics/realtime`).then(res => res.json()),
 };
 
 // General API functions
 export const generalAPI = {
-  // Auth
   login: (credentials) => api.post('/api/auth/login', credentials),
-  
-  // Users
   getUsers: () => api.get('/api/users'),
-  
   // Add other endpoints as needed
 };
 
 export default api;
-
-export const getSMEApplications = (token, status = 'pending') =>
-  fetchWithAuth(`/sme/applications?status=${status}`, token);
-export const approveSMEApplication = (token, id, reason) =>
-  fetchWithAuth(`/sme/applications/${id}/approve`, token, '', { method: 'POST', body: JSON.stringify({ reason }), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
-export const rejectSMEApplication = (token, id, reason) =>
-  fetchWithAuth(`/sme/applications/${id}/reject`, token, '', { method: 'POST', body: JSON.stringify({ reason }), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
-export const bulkSMEAction = (token, ids, action, reason) =>
-  fetchWithAuth(`/sme/applications/bulk-action`, token, '', { method: 'POST', body: JSON.stringify({ ids, action, reason }), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
-
-export const getSMEProfiles = (token) =>
-  fetchWithAuth('/sme/profiles', token);
-export const updateSMEProfile = (token, id, data) =>
-  fetchWithAuth(`/sme/profiles/${id}`, token, '', { method: 'PUT', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
-export const updateSMEAvailability = (token, id, available_time_slots) =>
-  fetchWithAuth(`/sme/profiles/${id}/availability`, token, '', { method: 'POST', body: JSON.stringify({ available_time_slots }), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
