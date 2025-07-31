@@ -4,15 +4,20 @@ import React, { createContext, useState, useEffect } from 'react';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
-  });
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
+    // Always clear stored credentials when app starts
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  }, []);
+
+  useEffect(() => {
+    // Sync user/token state to localStorage during session
     if (user) localStorage.setItem('user', JSON.stringify(user));
     else localStorage.removeItem('user');
+
     if (token) localStorage.setItem('token', token);
     else localStorage.removeItem('token');
   }, [user, token]);
@@ -21,6 +26,7 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     setToken(jwt);
   };
+
   const logout = () => {
     setUser(null);
     setToken(null);
