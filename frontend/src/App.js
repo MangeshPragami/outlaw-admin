@@ -10,6 +10,10 @@ import Surveys from './pages/Surveys';
 import SMEInformation from './pages/SMEInformation';
 import Settings from './pages/Settings';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
+import SMEApplications from './pages/SMEApplications';
+import SMEProfiles from './pages/SMEProfiles';
+import SMEEfforts from './pages/SMEEfforts';
+import SMEMeetings from './pages/SMEMeetings';
 
 function AppContent() {
   const { user, logout } = useContext(AuthContext);
@@ -27,6 +31,10 @@ function AppContent() {
           <Route path="/surveys" element={<Surveys />} />
           <Route path="/sme-matching" element={<SMEInformation />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/sme-applications" element={<SMEApplications />} />
+          <Route path="/sme-profiles" element={<SMEProfiles />} />
+          <Route path="/sme-efforts" element={<SMEEfforts />} />
+          <Route path="/sme-meetings" element={<SMEMeetings />} />
           <Route path="*" element={<Navigate to="/user-management" />} />
         </Routes>
       </Layout>

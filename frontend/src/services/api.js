@@ -544,3 +544,19 @@ export const generalAPI = {
 };
 
 export default api;
+
+export const getSMEApplications = (token, status = 'pending') =>
+  fetchWithAuth(`/sme/applications?status=${status}`, token);
+export const approveSMEApplication = (token, id, reason) =>
+  fetchWithAuth(`/sme/applications/${id}/approve`, token, '', { method: 'POST', body: JSON.stringify({ reason }), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
+export const rejectSMEApplication = (token, id, reason) =>
+  fetchWithAuth(`/sme/applications/${id}/reject`, token, '', { method: 'POST', body: JSON.stringify({ reason }), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
+export const bulkSMEAction = (token, ids, action, reason) =>
+  fetchWithAuth(`/sme/applications/bulk-action`, token, '', { method: 'POST', body: JSON.stringify({ ids, action, reason }), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
+
+export const getSMEProfiles = (token) =>
+  fetchWithAuth('/sme/profiles', token);
+export const updateSMEProfile = (token, id, data) =>
+  fetchWithAuth(`/sme/profiles/${id}`, token, '', { method: 'PUT', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });
+export const updateSMEAvailability = (token, id, available_time_slots) =>
+  fetchWithAuth(`/sme/profiles/${id}/availability`, token, '', { method: 'POST', body: JSON.stringify({ available_time_slots }), headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } });

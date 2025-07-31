@@ -9,7 +9,11 @@ const navItems = [
   { path: '/analytics', label: 'Analytics', icon: 'chart' },
   { path: '/surveys', label: 'Surveys', icon: 'clipboard' },
   { path: '/sme-matching', label: 'SME Matching', icon: 'network' },
-  { path: '/settings', label: 'Settings', icon: 'settings' }
+  { path: '/settings', label: 'Settings', icon: 'settings' },
+  { path: '/sme-applications', label: 'SME Applications', icon: 'network' },
+  { path: '/sme-profiles', label: 'SME Profiles', icon: 'users' },
+  { path: '/sme-efforts', label: 'SME Efforts', icon: 'clipboard' },
+  { path: '/sme-meetings', label: 'SME Meetings', icon: 'chart' }
 ];
 
 const Icon = ({ name, size = 20 }) => {
