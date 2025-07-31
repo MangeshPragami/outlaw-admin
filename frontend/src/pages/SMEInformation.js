@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
-import { getSMEOverview } from '../services/api';
+import { getAllApprovedSMEs } from '../services/api';
 
 const SMEInformation = () => {
   const [selectedSME, setSelectedSME] = useState(null);
@@ -18,8 +18,8 @@ const SMEInformation = () => {
       setLoading(true);
       setError('');
       try {
-        const data = await getSMEOverview(token);
-        setSMEs(data); // Adjust if API returns { smes: [...] }
+        const data = await getAllApprovedSMEs(token);
+        setSMEs(data.smes || data); // Adjust if API returns { smes: [...] }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -30,9 +30,12 @@ const SMEInformation = () => {
   }, [token]);
 
   const filteredSMEs = smes.filter(sme => {
-    const matchesSearch = sme.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          sme.specializations.some(spec => spec.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesStatus = filterStatus === 'all' || sme.status.toLowerCase() === filterStatus.toLowerCase();
+    const name = sme.name || '';
+    const specializations = Array.isArray(sme.specializations) ? sme.specializations : [];
+    const status = sme.status || '';
+    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      specializations.some(spec => spec.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesStatus = filterStatus === 'all' || status.toLowerCase() === filterStatus.toLowerCase();
     return matchesSearch && matchesStatus;
   });
 
@@ -98,7 +101,7 @@ const SMEInformation = () => {
                 {selectedSME.name}
               </h1>
               <p style={{ color: '#6c757d', fontSize: '14px', margin: '5px 0 0 0' }}>
-                {selectedSME.specializations.join(' • ')}
+                {(selectedSME.specializations ?? []).join(' • ')}
               </p>
             </div>
           </div>
@@ -121,19 +124,19 @@ const SMEInformation = () => {
             <div>
               <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '5px' }}>RATING</div>
               <div style={{ fontSize: '18px', fontWeight: '600', color: '#495057' }}>
-                ⭐ {selectedSME.rating}/5.0
+                ⭐ {selectedSME.rating ?? 0}/5.0
               </div>
             </div>
             <div>
               <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '5px' }}>TOTAL MEETINGS</div>
               <div style={{ fontSize: '18px', fontWeight: '600', color: '#495057' }}>
-                {selectedSME.totalMeetings}
+                {selectedSME.totalMeetings ?? 0}
               </div>
             </div>
             <div>
               <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '5px' }}>JOINED</div>
               <div style={{ fontSize: '18px', fontWeight: '600', color: '#495057' }}>
-                {new Date(selectedSME.joinedDate).toLocaleDateString()}
+                {selectedSME.joinedDate ? new Date(selectedSME.joinedDate).toLocaleDateString() : 'N/A'}
               </div>
             </div>
           </div>
@@ -190,11 +193,11 @@ const SMEInformation = () => {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
                     <div>
                       <h4 style={{ margin: '0 0 10px 0', color: '#495057' }}>Experience</h4>
-                      <p style={{ margin: 0, color: '#6c757d' }}>{selectedSME.portfolio.experience}</p>
+                      <p style={{ margin: 0, color: '#6c757d' }}>{selectedSME.portfolio?.experience ?? 'N/A'}</p>
                     </div>
                     <div>
                       <h4 style={{ margin: '0 0 10px 0', color: '#495057' }}>Education</h4>
-                      <p style={{ margin: 0, color: '#6c757d' }}>{selectedSME.portfolio.education}</p>
+                      <p style={{ margin: 0, color: '#6c757d' }}>{selectedSME.portfolio?.education ?? 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -203,7 +206,7 @@ const SMEInformation = () => {
                 <div style={{ marginBottom: '25px' }}>
                   <h4 style={{ marginBottom: '15px', color: '#495057' }}>Core Skills</h4>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {selectedSME.portfolio.skills.map((skill, index) => (
+                    {(selectedSME.portfolio?.skills ?? []).map((skill, index) => (
                       <span key={index} style={{
                         padding: '6px 12px',
                         backgroundColor: '#e7f3ff',
@@ -222,7 +225,7 @@ const SMEInformation = () => {
                 <div>
                   <h4 style={{ marginBottom: '15px', color: '#495057' }}>Recent Projects</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    {selectedSME.portfolio.projects.map((project, index) => (
+                    {(selectedSME.portfolio?.projects ?? []).map((project, index) => (
                       <div key={index} style={{
                         padding: '20px',
                         border: '1px solid #e3e6f0',
@@ -271,7 +274,7 @@ const SMEInformation = () => {
                   </button>
                 </div>
 
-                {selectedSME.scheduledMeets.length === 0 ? (
+                {!(selectedSME.scheduledMeets ?? []).length ? (
                   <div style={{
                     textAlign: 'center',
                     color: '#6c757d',
@@ -283,7 +286,7 @@ const SMEInformation = () => {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    {selectedSME.scheduledMeets.map((meeting) => (
+                    {(selectedSME.scheduledMeets ?? []).map((meeting) => (
                       <div key={meeting.id} style={{
                         padding: '20px',
                         border: '1px solid #e3e6f0',
@@ -374,7 +377,7 @@ const SMEInformation = () => {
                     boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                   }}>
                     <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#007bff', marginBottom: '10px' }}>
-                      {selectedSME.workingHours[timeFilter].hours}h
+                      {selectedSME.workingHours?.[timeFilter]?.hours ?? 0}h
                     </div>
                     <div style={{ color: '#6c757d', marginBottom: '10px' }}>
                       Total Hours {timeFilter === 'day' ? 'Today' : `This ${timeFilter.charAt(0).toUpperCase() + timeFilter.slice(1)}`}
@@ -394,13 +397,13 @@ const SMEInformation = () => {
                     boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                   }}>
                     <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#28a745', marginBottom: '10px' }}>
-                      {selectedSME.workingHours[timeFilter].meetings}
+                      {selectedSME.workingHours?.[timeFilter]?.meetings ?? 0}
                     </div>
                     <div style={{ color: '#6c757d', marginBottom: '10px' }}>
                       Meetings Conducted
                     </div>
                     <div style={{ fontSize: '14px', color: '#007bff' }}>
-                      Avg: {(selectedSME.workingHours[timeFilter].hours / selectedSME.workingHours[timeFilter].meetings || 0).toFixed(1)}h per meeting
+                      Avg: {((selectedSME.workingHours?.[timeFilter]?.hours ?? 0) / (selectedSME.workingHours?.[timeFilter]?.meetings ?? 1)).toFixed(1)}h per meeting
                     </div>
                   </div>
 
@@ -412,7 +415,7 @@ const SMEInformation = () => {
                     boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                   }}>
                     <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#ffc107', marginBottom: '10px' }}>
-                      {selectedSME.workingHours[timeFilter].consultations}
+                      {selectedSME.workingHours?.[timeFilter]?.consultations ?? 0}
                     </div>
                     <div style={{ color: '#6c757d', marginBottom: '10px' }}>
                       Consultations Given
@@ -647,7 +650,7 @@ const SMEInformation = () => {
           boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
         }}>
           <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#28a745', marginBottom: '5px' }}>
-            {filteredSMEs.filter(sme => sme.status === 'Active').length}
+            {filteredSMEs.filter(sme => (sme.status || '').toLowerCase() === 'active').length}
           </div>
           <div style={{ color: '#6c757d', fontSize: '14px' }}>Active SMEs</div>
         </div>
@@ -660,7 +663,7 @@ const SMEInformation = () => {
           boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
         }}>
           <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffc107', marginBottom: '5px' }}>
-            {filteredSMEs.reduce((sum, sme) => sum + sme.scheduledMeets.length, 0)}
+            {filteredSMEs.reduce((sum, sme) => sum + (Array.isArray(sme.scheduledMeets) ? sme.scheduledMeets.length : 0), 0)}
           </div>
           <div style={{ color: '#6c757d', fontSize: '14px' }}>Upcoming Meetings</div>
         </div>
@@ -672,8 +675,10 @@ const SMEInformation = () => {
           padding: '20px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
         }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#dc3545', marginBottom: '5px' }}>
-            {(filteredSMEs.reduce((sum, sme) => sum + sme.rating, 0) / filteredSMEs.length).toFixed(1)}
+          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffc107', marginBottom: '5px' }}>
+            {filteredSMEs.length === 0 ? 0 :
+              (filteredSMEs.reduce((sum, sme) => sum + (typeof sme.rating === 'number' ? sme.rating : 0), 0) / filteredSMEs.length).toFixed(1)
+            }
           </div>
           <div style={{ color: '#6c757d', fontSize: '14px' }}>Average Rating</div>
         </div>
@@ -718,28 +723,25 @@ const SMEInformation = () => {
                 >
                   <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
                     <img 
-                      src={sme.avatar} 
-                      alt={sme.name}
+                      src={sme.avatar || 'https://ui-avatars.com/api/?name=SME'} 
+                      alt={sme.name || 'SME'}
                       style={{ width: '60px', height: '60px', borderRadius: '50%', flexShrink: 0 }}
                     />
-                    
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                         <h4 style={{ margin: 0, color: '#495057', fontSize: '18px' }}>
-                          {sme.name}
+                          {sme.name || 'N/A'}
                         </h4>
-                        <span style={getStatusBadge(sme.status)}>{sme.status}</span>
+                        <span style={getStatusBadge(sme.status || 'inactive')}>{sme.status || 'Inactive'}</span>
                         <div style={{ fontSize: '14px', color: '#6c757d' }}>
-                          ⭐ {sme.rating}/5.0
+                          ⭐ {typeof sme.rating === 'number' ? sme.rating : 0}/5.0
                         </div>
                       </div>
-
                       <div style={{ fontSize: '14px', color: '#6c757d', marginBottom: '10px' }}>
-                        📧 {sme.email}
+                        📧 {sme.email || 'N/A'}
                       </div>
-
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
-                        {sme.specializations.map((spec, index) => (
+                        {(Array.isArray(sme.specializations) ? sme.specializations : []).map((spec, index) => (
                           <span key={index} style={{
                             padding: '4px 8px',
                             backgroundColor: '#e7f3ff',
@@ -752,12 +754,11 @@ const SMEInformation = () => {
                           </span>
                         ))}
                       </div>
-
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', fontSize: '13px', color: '#6c757d' }}>
-                        <span>📅 {sme.scheduledMeets.length} upcoming meetings</span>
-                        <span>💼 {sme.portfolio.projects.length} projects</span>
-                        <span>🕒 {sme.workingHours.week.hours}h this week</span>
-                        <span>📈 {sme.totalMeetings} total meetings</span>
+                        <span>📅 {(Array.isArray(sme.scheduledMeets) ? sme.scheduledMeets.length : 0)} upcoming meetings</span>
+                        <span>💼 {(sme.portfolio && Array.isArray(sme.portfolio.projects) ? sme.portfolio.projects.length : 0)} projects</span>
+                        <span>🕒 {(sme.workingHours && sme.workingHours.week && typeof sme.workingHours.week.hours === 'number' ? sme.workingHours.week.hours : 0)}h this week</span>
+                        <span>📈 {typeof sme.totalMeetings === 'number' ? sme.totalMeetings : 0} total meetings</span>
                       </div>
                     </div>
 

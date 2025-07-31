@@ -331,7 +331,6 @@ export async function getAdminSettings(token) {
   return res.json();
 }
 
-<<<<<<< HEAD
 // ===== SME MANAGEMENT APIs =====
 
 // Get all SME applications
@@ -485,9 +484,8 @@ export async function reactivateSME(token, smeId, reactivationData) {
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to reactivate SME');
   return res.json();
 }
-=======
+
 // ===== ANALYTICS API FUNCTIONS =====
-// Updated to use direct fetch for analytics (no auth required for testing)
 export const analyticsAPI = {
   // Health check
   health: () => fetch(`${API_BASE}/api/analytics/health`).then(res => res.json()),
@@ -546,4 +544,3 @@ export const generalAPI = {
 };
 
 export default api;
->>>>>>> 41741947e9cc8abf740f4dbfa964e92d476c23f6

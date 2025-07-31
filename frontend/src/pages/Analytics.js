@@ -68,6 +68,14 @@ const Analytics = () => {
         demographics,
         chimeOverview
       });
+      // Add this right after setData({...}) in loadDashboardData function
+console.log('=== COMPLETE DATA DEBUG ===');
+console.log('usersOverview:', usersOverview);
+console.log('usersOverview?.byPersonaType:', usersOverview?.byPersonaType);
+console.log('demographics:', demographics);
+console.log('demographics?.byCountry:', demographics?.byCountry);
+console.log('Array check:', Array.isArray(usersOverview?.byPersonaType));
+console.log('Length check:', usersOverview?.byPersonaType?.length);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       setError(error.message);

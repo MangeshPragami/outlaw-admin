@@ -46,23 +46,23 @@ router.get('/users/overview', async (req, res) => {
     const dateFilter = getDateFilter(period);
     
     const queries = await Promise.all([
-      // Total users
-      pool.query(`SELECT COUNT(*) as total_users FROM users WHERE ${dateFilter}`),
+      // Total users - FIXED WITH INTEGER CAST
+      pool.query(`SELECT COUNT(*)::INTEGER as total_users FROM users WHERE ${dateFilter}`),
       
-      // Users by persona type
+      // Users by persona type - FIXED WITH INTEGER CAST
       pool.query(`
-        SELECT persona_type, COUNT(*) as count 
+        SELECT persona_type, COUNT(*)::INTEGER as count 
         FROM users 
         WHERE ${dateFilter} 
         GROUP BY persona_type
       `),
       
-      // Email verification rate
+      // Email verification rate - FIXED
       pool.query(`
         SELECT 
-          COUNT(*) as total_users,
-          COUNT(email_verified_at) as verified_users,
-          ROUND((COUNT(email_verified_at)::numeric / NULLIF(COUNT(*), 0) * 100), 2) as verification_rate
+          COUNT(*)::INTEGER as total_users,
+          COUNT(email_verified_at)::INTEGER as verified_users,
+          CAST((COUNT(email_verified_at)::numeric / NULLIF(COUNT(*), 0) * 100) AS DECIMAL(5,2)) as verification_rate
         FROM users WHERE ${dateFilter}
       `)
     ]);
@@ -85,8 +85,8 @@ router.get('/users/growth', async (req, res) => {
     const query = `
       SELECT 
         DATE(created_at) as date,
-        COUNT(*) as new_users,
-        SUM(COUNT(*)) OVER (ORDER BY DATE(created_at)) as cumulative_users
+        COUNT(*)::INTEGER as new_users,
+        SUM(COUNT(*)::INTEGER) OVER (ORDER BY DATE(created_at)) as cumulative_users
       FROM users 
       WHERE created_at >= NOW() - INTERVAL '${period} days'
       GROUP BY DATE(created_at)
@@ -104,14 +104,14 @@ router.get('/users/growth', async (req, res) => {
 router.get('/users/demographics', async (req, res) => {
   try {
     const queries = await Promise.all([
-      // Geographic distribution
+      // Geographic distribution - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
           ui.country,
-          COUNT(*) as count,
-          COUNT(CASE WHEN u.persona_type = 'founder' THEN 1 END) as founders,
-          COUNT(CASE WHEN u.persona_type = 'sme' THEN 1 END) as smes,
-          COUNT(CASE WHEN u.persona_type = 'respondent' THEN 1 END) as respondents
+          COUNT(*)::INTEGER as count,
+          COUNT(CASE WHEN u.persona_type = 'founder' THEN 1 END)::INTEGER as founders,
+          COUNT(CASE WHEN u.persona_type = 'sme' THEN 1 END)::INTEGER as smes,
+          COUNT(CASE WHEN u.persona_type = 'respondent' THEN 1 END)::INTEGER as respondents
         FROM users u
         JOIN user_information ui ON u.id = ui.user_id
         WHERE ui.country IS NOT NULL
@@ -120,13 +120,13 @@ router.get('/users/demographics', async (req, res) => {
         LIMIT 15
       `),
       
-      // Industry distribution
+      // Industry distribution - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
           ui.industry,
-          COUNT(*) as count,
-          COUNT(CASE WHEN u.persona_type = 'founder' THEN 1 END) as founders,
-          COUNT(CASE WHEN u.persona_type = 'sme' THEN 1 END) as smes
+          COUNT(*)::INTEGER as count,
+          COUNT(CASE WHEN u.persona_type = 'founder' THEN 1 END)::INTEGER as founders,
+          COUNT(CASE WHEN u.persona_type = 'sme' THEN 1 END)::INTEGER as smes
         FROM users u
         JOIN user_information ui ON u.id = ui.user_id
         WHERE ui.industry IS NOT NULL
@@ -134,16 +134,16 @@ router.get('/users/demographics', async (req, res) => {
         ORDER BY count DESC
       `),
       
-      // Profile completion stats
+      // Profile completion stats - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-          COUNT(*) as total_profiles,
-          COUNT(CASE WHEN name IS NOT NULL THEN 1 END) as with_name,
-          COUNT(CASE WHEN industry IS NOT NULL THEN 1 END) as with_industry,
-          COUNT(CASE WHEN country IS NOT NULL THEN 1 END) as with_country,
-          COUNT(CASE WHEN linkedin IS NOT NULL THEN 1 END) as with_linkedin,
-          COUNT(CASE WHEN cv_url IS NOT NULL THEN 1 END) as with_cv,
-          ROUND((COUNT(CASE WHEN name IS NOT NULL AND industry IS NOT NULL AND country IS NOT NULL THEN 1 END)::float / NULLIF(COUNT(*), 0) * 100), 2) as completion_rate
+          COUNT(*)::INTEGER as total_profiles,
+          COUNT(CASE WHEN name IS NOT NULL THEN 1 END)::INTEGER as with_name,
+          COUNT(CASE WHEN industry IS NOT NULL THEN 1 END)::INTEGER as with_industry,
+          COUNT(CASE WHEN country IS NOT NULL THEN 1 END)::INTEGER as with_country,
+          COUNT(CASE WHEN linkedin IS NOT NULL THEN 1 END)::INTEGER as with_linkedin,
+          COUNT(CASE WHEN cv_url IS NOT NULL THEN 1 END)::INTEGER as with_cv,
+          CAST((COUNT(CASE WHEN name IS NOT NULL AND industry IS NOT NULL AND country IS NOT NULL THEN 1 END)::float / NULLIF(COUNT(*), 0) * 100) AS DECIMAL(5,2)) as completion_rate
         FROM user_information
       `)
     ]);
@@ -166,23 +166,23 @@ router.get('/ideas/overview', async (req, res) => {
     const dateFilter = getDateFilter(period);
     
     const queries = await Promise.all([
-      // Total ideas
-      pool.query(`SELECT COUNT(*) as total_ideas FROM ideas WHERE ${dateFilter}`),
+      // Total ideas - FIXED WITH INTEGER CAST
+      pool.query(`SELECT COUNT(*)::INTEGER as total_ideas FROM ideas WHERE ${dateFilter}`),
       
-      // Ideas by stage
+      // Ideas by stage - FIXED WITH INTEGER CAST
       pool.query(`
-        SELECT stage, COUNT(*) as count 
+        SELECT stage, COUNT(*)::INTEGER as count 
         FROM ideas 
         WHERE ${dateFilter}
         GROUP BY stage
       `),
       
-      // Ideas with attachments
+      // Ideas with attachments - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-          COUNT(*) as total_ideas,
-          COUNT(CASE WHEN pitch_deck IS NOT NULL THEN 1 END) as with_pitch_deck,
-          COUNT(CASE WHEN voice_note IS NOT NULL THEN 1 END) as with_voice_note
+          COUNT(*)::INTEGER as total_ideas,
+          COUNT(CASE WHEN pitch_deck IS NOT NULL THEN 1 END)::INTEGER as with_pitch_deck,
+          COUNT(CASE WHEN voice_note IS NOT NULL THEN 1 END)::INTEGER as with_voice_note
         FROM ideas WHERE ${dateFilter}
       `)
     ]);
@@ -205,31 +205,31 @@ router.get('/forms/overview', async (req, res) => {
     const dateFilter = getDateFilter(period);
 
     const queries = await Promise.all([
-      // Form stats
+      // Form stats - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-          COUNT(*) AS total_forms,
-          COUNT(CASE WHEN form_url IS NOT NULL THEN 1 END) AS forms_with_url
+          COUNT(*)::INTEGER AS total_forms,
+          COUNT(CASE WHEN form_url IS NOT NULL THEN 1 END)::INTEGER AS forms_with_url
         FROM forms
         WHERE ${dateFilter}
       `),
 
-      // Total responses
+      // Total responses - FIXED WITH INTEGER CAST
       pool.query(`
-        SELECT COUNT(*) AS total_responses
+        SELECT COUNT(*)::INTEGER AS total_responses
         FROM form_responses
         WHERE ${dateFilter}
       `),
 
-      // Form completion rate
+      // Form completion rate - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-        COUNT(DISTINCT f.id) AS total_forms,
-        COUNT(DISTINCT fr.form_id) AS forms_with_responses,
-        ROUND((COUNT(DISTINCT fr.form_id)::numeric / NULLIF(COUNT(DISTINCT f.id)::numeric, 0) * 100), 2) AS completion_rate
+        COUNT(DISTINCT f.id)::INTEGER AS total_forms,
+        COUNT(DISTINCT fr.form_id)::INTEGER AS forms_with_responses,
+        CAST((COUNT(DISTINCT fr.form_id)::numeric / NULLIF(COUNT(DISTINCT f.id)::numeric, 0) * 100) AS DECIMAL(5,2)) AS completion_rate
         FROM forms f
         LEFT JOIN form_responses fr ON f.id = fr.form_id
-        WHERE ${dateFilter}
+        WHERE ${dateFilter.replace('created_at', 'f.created_at')}
       `)
     ]);
 
@@ -251,25 +251,25 @@ router.get('/sme/overview', async (req, res) => {
     const dateFilter = getDateFilter(period);
     
     const queries = await Promise.all([
-      // SME basic metrics
+      // SME basic metrics - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-          COUNT(CASE WHEN persona_type = 'sme' THEN 1 END) as total_smes,
-          COUNT(CASE WHEN persona_type = 'sme' AND email_verified_at IS NOT NULL THEN 1 END) as verified_smes,
-          COUNT(DISTINCT fr.responder_id) as responding_smes
+          COUNT(CASE WHEN u.persona_type = 'sme' THEN 1 END)::INTEGER as total_smes,
+          COUNT(CASE WHEN u.persona_type = 'sme' AND u.email_verified_at IS NOT NULL THEN 1 END)::INTEGER as verified_smes,
+          COUNT(DISTINCT fr.responder_id)::INTEGER as responding_smes
         FROM users u
         LEFT JOIN form_responses fr ON u.id = fr.responder_id AND u.persona_type = 'sme'
-        WHERE ${dateFilter}
+        WHERE ${dateFilter.replace('created_at', 'u.created_at')}
       `),
       
-      // SME by industry
+      // SME by industry - FIXED WITH INTEGER CAST
       pool.query(`
         SELECT 
           ui.industry,
-          COUNT(*) as sme_count
+          COUNT(*)::INTEGER as sme_count
         FROM users u
         JOIN user_information ui ON u.id = ui.user_id
-        WHERE u.persona_type = 'sme' AND ui.industry IS NOT NULL AND ${dateFilter}
+        WHERE u.persona_type = 'sme' AND ui.industry IS NOT NULL
         GROUP BY ui.industry
         ORDER BY sme_count DESC
         LIMIT 10
@@ -293,13 +293,13 @@ router.get('/bookings/overview', async (req, res) => {
     const dateFilter = period === 'all' ? '1=1' : `start_time >= CURRENT_DATE - INTERVAL '${period === 'week' ? '7' : period === 'month' ? '30' : '90'} days'`;
     
     const queries = await Promise.all([
-      // Booking stats
+      // Booking stats - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-          COUNT(*) as total_bookings,
-          COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed,
-          COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
-          COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled
+          COUNT(*)::INTEGER as total_bookings,
+          COUNT(CASE WHEN status = 'confirmed' THEN 1 END)::INTEGER as confirmed,
+          COUNT(CASE WHEN status = 'completed' THEN 1 END)::INTEGER as completed,
+          COUNT(CASE WHEN status = 'cancelled' THEN 1 END)::INTEGER as cancelled
         FROM bookings WHERE ${dateFilter}
       `),
       
@@ -307,7 +307,7 @@ router.get('/bookings/overview', async (req, res) => {
       pool.query(`
         SELECT 
           AVG(EXTRACT(EPOCH FROM (end_time - start_time))/60) as avg_duration_minutes,
-          COUNT(*) as completed_sessions
+          COUNT(*)::INTEGER as completed_sessions
         FROM bookings 
         WHERE end_time IS NOT NULL AND start_time IS NOT NULL AND ${dateFilter}
       `)
@@ -330,15 +330,15 @@ router.get('/chime/overview', async (req, res) => {
     const dateFilter = period === 'all' ? '1=1' : `start_time >= CURRENT_DATE - INTERVAL '${period === 'week' ? '7' : period === 'month' ? '30' : '90'} days'`;
     
     const queries = await Promise.all([
-      // Session overview
+      // Session overview - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-          COUNT(*) as total_sessions,
-          COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_sessions,
-          COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END) as sessions_with_transcripts,
-          COUNT(CASE WHEN video_recording_url IS NOT NULL THEN 1 END) as sessions_with_recordings,
-          COUNT(CASE WHEN virtual_conference_id IS NOT NULL THEN 1 END) as chime_sessions,
-          ROUND((COUNT(CASE WHEN status = 'completed' THEN 1 END)::float / NULLIF(COUNT(*), 0) * 100), 2) as completion_rate
+          COUNT(*)::INTEGER as total_sessions,
+          COUNT(CASE WHEN status = 'completed' THEN 1 END)::INTEGER as completed_sessions,
+          COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END)::INTEGER as sessions_with_transcripts,
+          COUNT(CASE WHEN video_recording_url IS NOT NULL THEN 1 END)::INTEGER as sessions_with_recordings,
+          COUNT(CASE WHEN virtual_conference_id IS NOT NULL THEN 1 END)::INTEGER as chime_sessions,
+          CAST((COUNT(CASE WHEN status = 'completed' THEN 1 END)::float / NULLIF(COUNT(*), 0) * 100) AS DECIMAL(5,2)) as completion_rate
         FROM bookings 
         WHERE ${dateFilter}
       `),
@@ -350,7 +350,7 @@ router.get('/chime/overview', async (req, res) => {
           MIN(EXTRACT(EPOCH FROM (end_time - start_time))/60) as min_duration_minutes,
           MAX(EXTRACT(EPOCH FROM (end_time - start_time))/60) as max_duration_minutes,
           PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (end_time - start_time))/60) as median_duration_minutes,
-          COUNT(*) as sessions_with_duration
+          COUNT(*)::INTEGER as sessions_with_duration
         FROM bookings 
         WHERE end_time IS NOT NULL AND start_time IS NOT NULL AND ${dateFilter}
       `)
@@ -372,12 +372,12 @@ router.get('/chime/transcripts', async (req, res) => {
     const { period = '30' } = req.query;
     
     const queries = await Promise.all([
-      // Transcript summary
+      // Transcript summary - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-          COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END) as sessions_with_transcripts,
-          COUNT(*) as total_completed_sessions,
-          ROUND((COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END)::float / NULLIF(COUNT(*), 0) * 100), 2) as transcript_coverage_rate
+          COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END)::INTEGER as sessions_with_transcripts,
+          COUNT(*)::INTEGER as total_completed_sessions,
+          CAST((COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END)::float / NULLIF(COUNT(*), 0) * 100) AS DECIMAL(5,2)) as transcript_coverage_rate
         FROM bookings 
         WHERE status = 'completed' 
           AND start_time >= CURRENT_DATE - INTERVAL '${period} days'
@@ -408,14 +408,14 @@ router.get('/chime/transcripts', async (req, res) => {
         LIMIT 50
       `),
       
-      // Transcript processing success rate by day
+      // Transcript processing success rate by day - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
           DATE(start_time) as session_date,
-          COUNT(*) as total_sessions,
-          COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END) as transcripts_generated,
-          COUNT(CASE WHEN video_recording_url IS NOT NULL THEN 1 END) as recordings_available,
-          ROUND((COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END)::float / NULLIF(COUNT(*), 0) * 100), 2) as transcript_success_rate
+          COUNT(*)::INTEGER as total_sessions,
+          COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END)::INTEGER as transcripts_generated,
+          COUNT(CASE WHEN video_recording_url IS NOT NULL THEN 1 END)::INTEGER as recordings_available,
+          CAST((COUNT(CASE WHEN transcript_url IS NOT NULL THEN 1 END)::float / NULLIF(COUNT(*), 0) * 100) AS DECIMAL(5,2)) as transcript_success_rate
         FROM bookings 
         WHERE status = 'completed' 
           AND start_time >= CURRENT_DATE - INTERVAL '${period} days'
@@ -440,11 +440,11 @@ router.get('/engagement/funnel', async (req, res) => {
   try {
     const query = `
       SELECT 
-        COUNT(DISTINCT u.id) as total_users,
-        COUNT(DISTINCT ui.user_id) as users_with_profiles,
-        COUNT(DISTINCT i.user_id) as users_with_ideas,
-        COUNT(DISTINCT f.creator_id) as users_with_forms,
-        COUNT(DISTINCT fr.responder_id) as users_with_responses
+        COUNT(DISTINCT u.id)::INTEGER as total_users,
+        COUNT(DISTINCT ui.user_id)::INTEGER as users_with_profiles,
+        COUNT(DISTINCT i.user_id)::INTEGER as users_with_ideas,
+        COUNT(DISTINCT f.creator_id)::INTEGER as users_with_forms,
+        COUNT(DISTINCT fr.responder_id)::INTEGER as users_with_responses
       FROM users u
       LEFT JOIN user_information ui ON u.id = ui.user_id
       LEFT JOIN ideas i ON u.id = i.user_id
@@ -466,12 +466,12 @@ router.get('/engagement/funnel', async (req, res) => {
 router.get('/realtime', async (req, res) => {
   try {
     const queries = await Promise.all([
-      // Today's activity
+      // Today's activity - FIXED WITH INTEGER CASTS
       pool.query(`
         SELECT 
-          (SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURRENT_DATE) as new_users_today,
-          (SELECT COUNT(*) FROM ideas WHERE DATE(created_at) = CURRENT_DATE) as new_ideas_today,
-          (SELECT COUNT(*) FROM form_responses WHERE DATE(created_at) = CURRENT_DATE) as new_responses_today
+          (SELECT COUNT(*)::INTEGER FROM users WHERE DATE(created_at) = CURRENT_DATE) as new_users_today,
+          (SELECT COUNT(*)::INTEGER FROM ideas WHERE DATE(created_at) = CURRENT_DATE) as new_ideas_today,
+          (SELECT COUNT(*)::INTEGER FROM form_responses WHERE DATE(created_at) = CURRENT_DATE) as new_responses_today
       `),
       
       // Recent activity
