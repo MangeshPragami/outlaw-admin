@@ -7,6 +7,7 @@ import UserManagement from './pages/UserManagement';
 import IdeasStudies from './pages/IdeasStudies';
 import Analytics from './pages/Analytics';
 import Surveys from './pages/Surveys';
+import Bookings from './pages/Bookings'; // NEW
 import SMEInformation from './pages/SMEInformation';
 import Settings from './pages/Settings';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
@@ -25,6 +26,7 @@ function AppContent() {
           <Route path="/ideas-studies" element={<IdeasStudies />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/surveys" element={<Surveys />} />
+          <Route path="/bookings" element={<Bookings />} /> {/* NEW */}
           <Route path="/sme-matching" element={<SMEInformation />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/user-management" />} />

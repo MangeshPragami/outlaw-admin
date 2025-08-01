@@ -13,7 +13,7 @@ const SurveyFormViewer = ({ formUrl, onClose }) => {
       const response = await fetch(formUrl);
       if (!response.ok) throw new Error('Failed to fetch form data');
       const data = await response.json();
-      setFormData(data);
+      setFormData({ isExternalForm: true, url: formUrl });
     } catch (err) {
       setError('Failed to load form data: ' + err.message);
     } finally {

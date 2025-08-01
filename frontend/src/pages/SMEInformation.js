@@ -743,21 +743,21 @@ const SMEInformation = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-4 mb-8">
-        {navTabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveView(tab.key)}
-            className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-              activeView === tab.key
-                ? 'bg-purple-500 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            {tab.label} {tab.count !== null && `(${tab.count})`}
-          </button>
-        ))}
-      </div>
+<div className="flex gap-4 mb-8">
+  {navTabs.map((tab) => (
+    <button
+      key={tab.key}
+      onClick={() => setActiveView(tab.key)}
+      className={`px-6 py-3 rounded-lg font-medium transition-colors border-2 ${
+        activeView === tab.key
+          ? 'bg-purple-500 text-black border-purple-500'
+          : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-transparent hover:border-purple-500/50'
+      }`}
+    >
+      {tab.label} {tab.count !== null && `(${tab.count})`}
+    </button>
+  ))}
+</div>
 
       {/* Filters */}
       <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 mb-8">

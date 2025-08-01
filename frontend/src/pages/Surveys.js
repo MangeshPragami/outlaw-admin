@@ -1,4 +1,5 @@
 // Create new file: src/pages/Surveys.js
+import ResponseViewer from '../components/ResponseViewer';
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import SurveyFormViewer from '../components/SurveyFormViewer';
@@ -15,6 +16,8 @@ import {
 } from '../services/api';
 
 const Surveys = () => {
+  const [showResponseViewer, setShowResponseViewer] = useState(false);
+  const [selectedResponseUrl, setSelectedResponseUrl] = useState(''); 
   const [surveys, setSurveys] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [ideas, setIdeas] = useState([]);
@@ -813,7 +816,7 @@ const Surveys = () => {
                         alignItems: 'center'
                       }}>
                         <div>
-                          <div style={{ fontWeight: '600', fontSize: '14px' }}>
+                          <div style={{ fontWeight: '600', fontSize: '14px', color:'black' }}>
                             {response.responder_name || response.responder_email}
                           </div>
                           <div style={{ fontSize: '12px', color: '#6c757d' }}>
@@ -824,18 +827,22 @@ const Surveys = () => {
                           {formatDate(response.created_at)}
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <a 
-                            href={response.form_response_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={{ 
-                              fontSize: '12px', 
-                              color: '#8A5CF6',
-                              textDecoration: 'none'
-                            }}
-                          >
-                            View Response →
-                          </a>
+                          <button
+  onClick={() => {
+    setSelectedResponseUrl(response.form_response_url);
+    setShowResponseViewer(true);
+  }}
+  style={{
+    fontSize: '12px',
+    color: '#8A5CF6',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    textDecoration: 'underline'
+  }}
+>
+  View Response →
+</button>
                         </div>
                       </div>
                     ))}
@@ -979,6 +986,16 @@ const Surveys = () => {
         )}
       </div>
       {/* ...existing modals and dialogs... */}
+      {showCreateForm && <CreateSurveyForm />}
+      {showEditForm && <EditSurveyForm />}
+      {showResponseViewer && (
+        <ResponseViewer
+          responseUrl={selectedResponseUrl}
+          onClose={() => setShowResponseViewer(false)}
+        />
+      )}
+        {/* ← Final closing div */}
+
     </div>
   );
 };

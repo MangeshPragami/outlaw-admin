@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5001'; // Updated port to match server
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5001/'; // Updated port to match server
 
 
 // Create axios instance
@@ -123,6 +123,97 @@ export async function setUserAdminVerified(token, userId, verified) {
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to update admin verification');
   return res.json();
 }
+// ===== BOOKINGS =====
+// src/services/api.js - Add these functions to your existing api.js file
+
+// Bookings API functions
+export const getBookingsOverview = async (token, period = 'all') => {
+  const response = await fetch(`${API_BASE}/bookings/overview?period=${period}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to fetch bookings overview');
+  return response.json();
+};
+
+export const getAllBookings = async (token) => {
+  const response = await fetch(`${API_BASE}/bookings`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to fetch bookings');
+  return response.json();
+};
+
+export const getBookingById = async (token, id) => {
+  const response = await fetch(`${API_BASE}/bookings/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to fetch booking');
+  return response.json();
+};
+
+export const createBooking = async (token, bookingData) => {
+  const response = await fetch(`${API_BASE}/bookings`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(bookingData)
+  });
+  if (!response.ok) throw new Error('Failed to create booking');
+  return response.json();
+};
+
+export const updateBooking = async (token, id, bookingData) => {
+  const response = await fetch(`${API_BASE}/bookings/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(bookingData)
+  });
+  if (!response.ok) throw new Error('Failed to update booking');
+  return response.json();
+};
+
+export const deleteBooking = async (token, id) => {
+  const response = await fetch(`${API_BASE}/bookings/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to delete booking');
+  return response.json();
+};
+
+export const updateBookingStatus = async (token, id, status) => {
+  const response = await fetch(`${API_BASE}/bookings/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!response.ok) throw new Error('Failed to update booking status');
+  return response.json();
+};
+
+export const getBookingsByStatus = async (token, status) => {
+  const response = await fetch(`${API_BASE}/bookings/status/${status}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to fetch bookings by status');
+  return response.json();
+};
+
+export const getUpcomingBookings = async (token) => {
+  const response = await fetch(`${API_BASE}/bookings/upcoming`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to fetch upcoming bookings');
+  return response.json();
+};
 
 // ===== IDEAS - ORIGINAL ANALYTICS FUNCTIONS =====
 export async function getIdeasOverview(token) {
