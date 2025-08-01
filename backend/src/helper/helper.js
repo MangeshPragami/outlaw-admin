@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { config } from "dotenv";
 import { cache } from '../db/pool.js';
-import { TOTP } from "totp-generator"
+import pkg from 'totp-generator';
+const { TOTP } = pkg;
+// Then use totp.TOTP instead of just TOTP
 import { logger } from '../logger/logger.js';
 import { DEFAULT_TIME_SLOTS } from './constants.js';
 config();
