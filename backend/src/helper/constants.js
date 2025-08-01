@@ -1,7 +1,22 @@
 export const ADMIN_API_PATHS = {
     CREATE_MEETING : '/admin/create-meeting',
-    CREATE_BOOKING : '/admin/create-booking'
+    CREATE_BOOKING : '/admin/create-booking',
+        // New admin user management paths
+    APPROVE_USER: '/admin/approve-user',
+    CREATE_USER: '/admin/create-user',
+    DELETE_USER: '/admin/delete-user',
+    GET_ALL_USERS: '/admin/get-all-users',
+    
+    // SME Management paths
+    GET_ALL_SME_APPLICATIONS: '/admin/get-all-sme-applications',
+    APPROVE_SME_APPLICATION: '/admin/approve-sme-application',
+    REJECT_SME_APPLICATION: '/admin/reject-sme-application',
+    GET_ALL_APPROVED_SMES: '/admin/get-all-approved-smes',
+    GET_SME_EFFORTS: '/admin/get-sme-efforts',
+    UPDATE_SME_PROFILE: '/admin/update-sme-profile',
 };
+
+
 
 export const API_PATHS = {
     LOGIN: '/login',
@@ -49,6 +64,19 @@ export const API_PATHS = {
     GET_USER_CONSENT: '/user-consent/verify',
     UPDATE_USER_CONSENT: '/user-consent/provide',
     GOOGLE_AUTH: '/google-auth',
+        // ===== ANALYTICS LAMBDA FUNCTIONS =====
+    HEALTH_CHECK: '/health',
+    USER_OVERVIEW: '/user-overview',
+    USER_GROWTH: '/user-growth',
+    USER_DEMOGRAPHICS: '/user-demographics',
+    IDEAS_OVERVIEW: '/ideas-overview',
+    FORMS_OVERVIEW: '/forms-overview',
+    SME_OVERVIEW: '/sme-overview',
+    BOOKINGS_OVERVIEW: '/bookings-overview',
+    CHIME_OVERVIEW: '/chime-overview',
+    CHIME_TRANSCRIPTS: '/chime-transcripts',
+    ENGAGEMENT_FUNNEL: '/engagement-funnel',
+    REALTIME_DASHBOARD: '/realtime-dashboard',
 }
 
 export const USER_ROLES = {

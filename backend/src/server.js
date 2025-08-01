@@ -50,6 +50,36 @@ import {createBookingAdmin } from "./admin/bookings/create.js";
 import {createMeeting } from "./bookings/create-meeting.js";
 import {googleLoginOrSignup} from "./auth/google/googleLoginOrSignup.js";
 
+
+// sme
+import { getAllSMEApplications } from './ADMIN/sme/getAllSMEApplications.js';
+import { approveSMEApplication } from './ADMIN/sme/approveSMEApplication.js';
+import { rejectSMEApplication } from './ADMIN/sme/rejectSMEApplication.js';
+import { getAllApprovedSMEs } from './ADMIN/sme/getAllApprovedSMEs.js';
+import { getSMEEfforts } from './ADMIN/sme/getSMEEfforts.js';
+import { updateSMEProfile } from './ADMIN/sme/updateSMEProfile.js';
+
+// ===== ANALYTICS LAMBDA FUNCTIONS =====
+import { healthCheck } from './ADMIN/analytics/healthCheck.js';
+import { userOverview } from './ADMIN/analytics/userOverview.js';
+import { userGrowth } from './ADMIN/analytics/userGrowth.js';
+import { userDemographics } from './ADMIN/analytics/userDemographics.js';
+import { ideasOverview } from './ADMIN/analytics/ideasOverview.js';
+import { formsOverview } from './ADMIN/analytics/formsOverview.js';
+import { smeOverview } from './ADMIN/analytics/smeOverview.js';
+import { bookingsOverview } from './ADMIN/analytics/bookingsOverview.js';
+import { chimeOverview } from './ADMIN/analytics/chimeOverview.js';
+import { chimeTranscripts } from './ADMIN/analytics/chimeTranscripts.js';
+import { engagementFunnel } from './ADMIN/analytics/engagementFunnel.js';
+import { realtimeDashboard } from './ADMIN/analytics/realtimeDashboard.js';
+
+// ===== ADMIN USER MANAGEMENT LAMBDA FUNCTIONS =====
+import { approveUser } from './ADMIN/users/approveUser.js';
+import { createUser } from './ADMIN/users/createUser.js';
+import { deleteUser } from './ADMIN/users/deleteUser.js';
+import { getAllUsers } from './ADMIN/users/getAllUsers.js';
+
+
 config();
 
 const FILE_NAME = 'root/server.js';
@@ -290,6 +320,84 @@ export const app = async (event, context, requestId) => {
             // expects only bookingId in body
             return await createBookingAdmin(body);
         }
+
+        case ADMIN_API_PATHS.GET_ALL_SME_APPLICATIONS: {
+            return await getAllSMEApplications(body);
+        }
+        case ADMIN_API_PATHS.APPROVE_SME_APPLICATION: {
+            return await approveSMEApplication(body);
+        }
+        case ADMIN_API_PATHS.REJECT_SME_APPLICATION: {
+            return await rejectSMEApplication(body);
+        }
+        case ADMIN_API_PATHS.GET_ALL_APPROVED_SMES: {
+            return await getAllApprovedSMEs(body);
+        }
+        case ADMIN_API_PATHS.GET_SME_EFFORTS: {
+            return await getSMEEfforts(body);
+        }
+        case ADMIN_API_PATHS.UPDATE_SME_PROFILE: {
+            return await updateSMEProfile(body);
+        }
+        case ADMIN_API_PATHS.GET_SME_PERFORMANCE_ANALYTICS: {
+            
+        }
+
+                // ===== ANALYTICS LAMBDA FUNCTIONS =====
+        case API_PATHS.HEALTH_CHECK: {
+            return await healthCheck(body);
+        }
+        case API_PATHS.USER_OVERVIEW: {
+            return await userOverview(body);
+        }
+        case API_PATHS.USER_GROWTH: {
+            return await userGrowth(body);
+        }
+        case API_PATHS.USER_DEMOGRAPHICS: {
+            return await userDemographics(body);
+        }
+        case API_PATHS.IDEAS_OVERVIEW: {
+            return await ideasOverview(body);
+        }
+        case API_PATHS.FORMS_OVERVIEW: {
+            return await formsOverview(body);
+        }
+        case API_PATHS.SME_OVERVIEW: {
+            return await smeOverview(body);
+        }
+        case API_PATHS.BOOKINGS_OVERVIEW: {
+            return await bookingsOverview(body);
+        }
+        case API_PATHS.CHIME_OVERVIEW: {
+            return await chimeOverview(body);
+        }
+        case API_PATHS.CHIME_TRANSCRIPTS: {
+            return await chimeTranscripts(body);
+        }
+        case API_PATHS.ENGAGEMENT_FUNNEL: {
+            return await engagementFunnel(body);
+        }
+        case API_PATHS.REALTIME_DASHBOARD: {
+            return await realtimeDashboard(body);
+        }
+
+                /**
+         * ADMIN USER MANAGEMENT ROUTES
+         */
+        case ADMIN_API_PATHS.APPROVE_USER: {
+            return await approveUser(body);
+        }
+        case ADMIN_API_PATHS.CREATE_USER: {
+            return await createUser(body);
+        }
+        case ADMIN_API_PATHS.DELETE_USER: {
+            return await deleteUser(body);
+        }
+        case ADMIN_API_PATHS.GET_ALL_USERS: {
+            return await getAllUsers(body);
+        }
+
+
         default: {
             return {
                 statusCode: 404,
