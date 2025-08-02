@@ -7,7 +7,7 @@ const navItems = [
   { path: '/user-management', label: 'User Management', icon: 'users' },
   { path: '/ideas-studies', label: 'Ideas & Studies', icon: 'lightbulb' },
   { path: '/analytics', label: 'Analytics', icon: 'chart' },
-  { path: '/surveys', label: 'Surveys', icon: 'clipboard' },
+  { path: '/surveys', label: 'Forms', icon: 'clipboard' },
   { path: '/sme-matching', label: 'SME Matching', icon: 'network' },
   { path: '/settings', label: 'Settings', icon: 'settings' }
 ];

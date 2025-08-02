@@ -543,4 +543,30 @@ export const generalAPI = {
   // Add other endpoints as needed
 };
 
+// Add these functions to your existing services/api.js file
+
+// ===== IDEAS MANAGEMENT ADDITIONS =====
+
+export async function deleteIdea(token, ideaId) {
+  const res = await fetch(`${API_BASE}/api/ideas/${ideaId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to delete idea');
+  return res.json();
+}
+
+export async function updateIdeaStatus(token, ideaId, status) {
+  const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update idea status');
+  return res.json();
+}
+
 export default api;

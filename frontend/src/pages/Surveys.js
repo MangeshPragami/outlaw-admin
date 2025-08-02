@@ -1,7 +1,8 @@
-// Create new file: src/pages/Surveys.js
+// Create new file: src/pages/Forms.js
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import SurveyFormViewer from '../components/SurveyFormViewer';
+import ResponseViewer from '../components/ResponseViewer';
 import { 
   getAllSurveys, 
   getSurveyById, 
@@ -14,7 +15,7 @@ import {
   getAllIdeas 
 } from '../services/api';
 
-const Surveys = () => {
+const Forms = () => {
   const [surveys, setSurveys] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [ideas, setIdeas] = useState([]);
@@ -23,13 +24,13 @@ const Surveys = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [viewerFormUrl, setViewerFormUrl] = useState('');
-  const [currentView, setCurrentView] = useState('list'); // 'list', 'details', 'formViewer'
+  const [selectedResponseUrl, setSelectedResponseUrl] = useState('');
+  const [currentView, setCurrentView] = useState('list'); // 'list', 'details', 'formViewer', 'responseViewer'
   const [loading, setLoading] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const { token } = useContext(AuthContext);
 
   const fetchData = useCallback(async () => {
@@ -85,7 +86,7 @@ const Surveys = () => {
           result = await stopSurvey(token, surveyId);
           break;
         case 'delete':
-          if (window.confirm('Are you sure you want to delete this survey? This will also delete all responses.')) {
+          if (window.confirm('Are you sure you want to delete this form? This will also delete all responses.')) {
             result = await deleteSurvey(token, surveyId);
             if (selectedSurvey?.id === surveyId) {
               setSelectedSurvey(null);
@@ -109,24 +110,6 @@ const Surveys = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const styles = {
-      'Active': { backgroundColor: '#d4edda', color: '#155724' },
-      'Completed': { backgroundColor: '#cce5ff', color: '#004085' },
-      'Draft': { backgroundColor: '#fff3cd', color: '#856404' },
-      'Scheduled': { backgroundColor: '#e2e3e5', color: '#383d41' }
-    };
-    
-    return {
-      padding: '4px 12px',
-      borderRadius: '12px',
-      fontSize: '12px',
-      fontWeight: '600',
-      textTransform: 'uppercase',
-      ...(styles[status] || styles['Draft'])
-    };
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return 'Not set';
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -138,12 +121,11 @@ const Surveys = () => {
   const filteredSurveys = surveys.filter(survey => {
     const matchesSearch = survey.idea_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           survey.creator_email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || survey.survey_status === statusFilter;
-    return matchesSearch && matchesStatus;
+    return matchesSearch;
   });
 
-  // Create Survey Form Component
-  const CreateSurveyForm = () => {
+  // Create Form Component
+  const CreateFormComponent = () => {
     const [formData, setFormData] = useState({
       idea_id: '',
       form_url: '',
@@ -189,7 +171,7 @@ const Surveys = () => {
           overflow: 'auto',
           border: '1px solid #8A5CF6'
         }}>
-          <h3 style={{ marginTop: 0, color: '#8A5CF6' }}>Create New Survey</h3>
+          <h3 style={{ marginTop: 0, color: '#8A5CF6' }}>Create New Form</h3>
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
@@ -216,12 +198,12 @@ const Surveys = () => {
                   </option>
                 ))}
               </select>
-              <small style={{ color: '#6c757d' }}>Only ideas without existing surveys are shown</small>
+              <small style={{ color: '#6c757d' }}>Only ideas without existing forms are shown</small>
             </div>
 
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
-                Survey Form URL *
+                Form URL *
               </label>
               <input
                 type="url"
@@ -239,7 +221,7 @@ const Surveys = () => {
                   fontSize: '14px'
                 }}
               />
-              <small style={{ color: '#6c757d' }}>Link to your external survey form</small>
+              <small style={{ color: '#6c757d' }}>Link to your external form</small>
             </div>
 
             <div style={{ marginBottom: '16px' }}>
@@ -312,7 +294,7 @@ const Surveys = () => {
                   cursor: 'pointer'
                 }}
               >
-                {submitting ? 'Creating...' : 'Create Survey'}
+                {submitting ? 'Creating...' : 'Create Form'}
               </button>
             </div>
           </form>
@@ -321,8 +303,8 @@ const Surveys = () => {
     );
   };
 
-  // Edit Survey Form Component
-  const EditSurveyForm = () => {
+  // Edit Form Component
+  const EditFormComponent = () => {
     const [formData, setFormData] = useState({
       form_url: selectedSurvey?.form_url || '',
       start_time: selectedSurvey?.start_time ? selectedSurvey.start_time.slice(0, 16) : '',
@@ -370,11 +352,11 @@ const Surveys = () => {
           overflow: 'auto',
           border: '1px solid #8A5CF6'
         }}>
-          <h3 style={{ marginTop: 0, color: '#8A5CF6' }}>Edit Survey</h3>
+          <h3 style={{ marginTop: 0, color: '#8A5CF6' }}>Edit Form</h3>
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', color: '#e0e0e0' }}>
-                Survey Form URL *
+                Form URL *
               </label>
               <input
                 type="url"
@@ -461,7 +443,7 @@ const Surveys = () => {
                   cursor: 'pointer'
                 }}
               >
-                {submitting ? 'Updating...' : 'Update Survey'}
+                {submitting ? 'Updating...' : 'Update Form'}
               </button>
             </div>
           </form>
@@ -490,31 +472,7 @@ const Surveys = () => {
           <h3 style={{ margin: '0 0 8px 0', fontSize: '24px', color: '#495057' }}>
             {analytics.overview.total_surveys || 0}
           </h3>
-          <p style={{ margin: 0, color: '#6c757d' }}>Total Surveys</p>
-        </div>
-        
-        <div style={{ 
-          backgroundColor: '#d4edda', 
-          padding: '16px', 
-          borderRadius: '8px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '24px', color: '#155724' }}>
-            {analytics.overview.active_surveys || 0}
-          </h3>
-          <p style={{ margin: 0, color: '#155724' }}>Active Surveys</p>
-        </div>
-        
-        <div style={{ 
-          backgroundColor: '#cce5ff', 
-          padding: '16px', 
-          borderRadius: '8px',
-          textAlign: 'center'
-        }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '24px', color: '#004085' }}>
-            {analytics.overview.completed_surveys || 0}
-          </h3>
-          <p style={{ margin: 0, color: '#004085' }}>Completed</p>
+          <p style={{ margin: 0, color: '#6c757d' }}>Total Forms</p>
         </div>
         
         <div style={{ 
@@ -554,7 +512,17 @@ const Surveys = () => {
     />;
   }
 
-  // Detailed Survey View Component
+  // Response Viewer View
+  if (currentView === 'responseViewer') {
+    return <ResponseViewer 
+      responseUrl={selectedResponseUrl}
+      onClose={() => {
+        setCurrentView(selectedSurvey ? 'details' : 'list');
+      }}
+    />;
+  }
+
+  // Detailed Form View Component
   if (selectedSurvey) {
     return (
       <div style={{ padding: '20px' }}>
@@ -574,7 +542,7 @@ const Surveys = () => {
               cursor: 'pointer'
             }}
           >
-            ← Back to Surveys
+            ← Back to Forms
           </button>
           
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -589,45 +557,8 @@ const Surveys = () => {
                 cursor: 'pointer'
               }}
             >
-              Edit Survey
+              Edit Form
             </button>
-            
-            {selectedSurvey.survey_status === 'Draft' && (
-              <button 
-                onClick={() => {
-                  const days = prompt('Duration in days (leave empty for indefinite):');
-                  handleAction('start', selectedSurvey.id, { duration: days ? parseInt(days) : null });
-                }}
-                disabled={actionLoading === selectedSurvey.id}
-                style={{ 
-                  padding: '8px 16px', 
-                  backgroundColor: '#28a745', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                {actionLoading === selectedSurvey.id ? 'Starting...' : 'Start Survey'}
-              </button>
-            )}
-            
-            {selectedSurvey.survey_status === 'Active' && (
-              <button 
-                onClick={() => handleAction('stop', selectedSurvey.id)}
-                disabled={actionLoading === selectedSurvey.id}
-                style={{ 
-                  padding: '8px 16px', 
-                  backgroundColor: '#dc3545', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                {actionLoading === selectedSurvey.id ? 'Stopping...' : 'Stop Survey'}
-              </button>
-            )}
             
             <button 
               onClick={() => handleAction('delete', selectedSurvey.id)}
@@ -648,13 +579,13 @@ const Surveys = () => {
 
         {detailsLoading ? (
           <div style={{ textAlign: 'center', padding: '40px' }}>
-            Loading survey details...
+            Loading form details...
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
             {/* Main content */}
             <div>
-              <h2 style={{ marginBottom: '16px', color: '#8A5CF6' }}>Survey for "{selectedSurvey.idea_name}"</h2>
+              <h2 style={{ marginBottom: '16px', color: '#8A5CF6' }}>Form for "{selectedSurvey.idea_name}"</h2>
               
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -684,7 +615,7 @@ const Surveys = () => {
                     </a>
                   </div>
                   <div>
-                    <strong>Creator:</strong> {selectedSurvey.creator_name || selectedSurvey.creator_email}
+                    <strong>Creator:</strong> {selectedSurvey.creator_id}
                   </div>
                   <div>
                     <strong>Created:</strong> {formatDate(selectedSurvey.created_at)}
@@ -710,26 +641,6 @@ const Surveys = () => {
                 border: '1px solid #8A5CF6'
               }}>
                 <h3 style={{ marginBottom: '16px', color: '#8A5CF6' }}>Response Collection Progress</h3>
-                
-                <div style={{ marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span>Time Progress</span>
-                    <span>{selectedSurvey.time_progress_percentage || 0}%</span>
-                  </div>
-                  <div style={{ 
-                    backgroundColor: '#2c2c3e', 
-                    height: '8px', 
-                    borderRadius: '4px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{ 
-                      backgroundColor: '#8A5CF6', 
-                      height: '100%', 
-                      width: `${selectedSurvey.time_progress_percentage || 0}%`,
-                      transition: 'width 0.3s ease'
-                    }}></div>
-                  </div>
-                </div>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
                   <div style={{ textAlign: 'center' }}>
@@ -813,29 +724,33 @@ const Surveys = () => {
                         alignItems: 'center'
                       }}>
                         <div>
-                          <div style={{ fontWeight: '600', fontSize: '14px' }}>
-                            {response.responder_name || response.responder_email}
+                          <div style={{ fontWeight: '600', fontSize: '14px', color: '#000' }}>
+                            Respondent ID: {response.responder_id}
                           </div>
                           <div style={{ fontSize: '12px', color: '#6c757d' }}>
-                            {response.responder_type}
+                            {response.responder_type || 'Respondent'}
                           </div>
                         </div>
                         <div style={{ fontSize: '12px', color: '#6c757d' }}>
                           {formatDate(response.created_at)}
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <a 
-                            href={response.form_response_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
+                          <button 
+                            onClick={() => {
+                              setSelectedResponseUrl(response.form_response_url);
+                              setCurrentView('responseViewer');
+                            }}
                             style={{ 
                               fontSize: '12px', 
                               color: '#8A5CF6',
-                              textDecoration: 'none'
+                              backgroundColor: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              textDecoration: 'underline'
                             }}
                           >
                             View Response →
-                          </a>
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -858,19 +773,6 @@ const Surveys = () => {
                 marginBottom: '16px',
                 border: '1px solid #8A5CF6'
               }}>
-                <h4 style={{ marginBottom: '12px', color: '#8A5CF6' }}>Survey Status</h4>
-                <span style={getStatusBadge(selectedSurvey.survey_status)}>
-                  {selectedSurvey.survey_status}
-                </span>
-              </div>
-
-              <div style={{ 
-                backgroundColor: '#1e1e2e', 
-                padding: '16px', 
-                borderRadius: '8px',
-                marginBottom: '16px',
-                border: '1px solid #8A5CF6'
-              }}>
                 <h4 style={{ marginBottom: '12px', color: '#8A5CF6' }}>Idea Information</h4>
                 <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
                   <div style={{ marginBottom: '8px' }}>
@@ -884,78 +786,46 @@ const Surveys = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Response Analytics */}
-              {surveyDetails?.analytics && (
-                <div style={{ 
-                  backgroundColor: '#1e1e2e', 
-                  padding: '16px', 
-                  borderRadius: '8px',
-                  border: '1px solid #8A5CF6'
-                }}>
-                  <h4 style={{ marginBottom: '12px', color: '#8A5CF6' }}>Analytics</h4>
-                  <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
-                    <div style={{ marginBottom: '8px' }}>
-                      <strong>Avg Response Time:</strong> {Math.round(surveyDetails.analytics.averageResponseTime || 0)} hours
-                    </div>
-                    <div style={{ marginBottom: '8px' }}>
-                      <strong>Response Rate:</strong> {surveyDetails.analytics.responseRate} per day
-                    </div>
-                    {surveyDetails.analytics.totalDuration && (
-                      <div style={{ marginBottom: '8px' }}>
-                        <strong>Duration:</strong> {Math.round(surveyDetails.analytics.totalDuration)} days
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
 
-        {showEditForm && <EditSurveyForm />}
+        {showEditForm && <EditFormComponent />}
       </div>
     );
   }
 
-  // Main Surveys List View
+  // Main Forms List View
   return (
     <div className="min-h-screen bg-black text-white p-8">
-      <h1 className="heading-main mb-8">Surveys</h1>
+      <h1 className="heading-main mb-8">Forms</h1>
+      
+      {/* Analytics Dashboard */}
+      <AnalyticsDashboard />
+      
       {/* Filters and Search */}
       <div className="card-dark card-accent p-6 mb-8 flex items-center gap-6">
         <input
           type="text"
-          placeholder="Search surveys..."
+          placeholder="Search forms..."
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           className="bg-black text-purple-main border border-purple-main rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-main"
         />
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-          className="bg-black text-purple-main border border-purple-main rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-main"
-        >
-          <option value="all">All Status</option>
-          <option value="Draft">Draft</option>
-          <option value="Active">Active</option>
-          <option value="Completed">Completed</option>
-          <option value="Scheduled">Scheduled</option>
-        </select>
-        <button onClick={() => setShowCreateForm(true)} className="btn-primary ml-auto">Create Survey</button>
+        <button onClick={() => setShowCreateForm(true)} className="btn-primary ml-auto">Create Form</button>
       </div>
-      {/* Survey Table/Card List */}
+      
+      {/* Form Table/Card List */}
       <div className="card-dark card-accent p-6">
         {filteredSurveys.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#8A5CF6', padding: '24px' }}>No surveys found.</div>
+          <div style={{ textAlign: 'center', color: '#8A5CF6', padding: '24px' }}>No forms found.</div>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr style={{ color: '#8A5CF6', borderBottom: '2px solid #8A5CF6' }}>
-                <th>Idea Name</th>
+                <th>Form ID</th>
+                <th>Idea Name (ID)</th>
                 <th>Creator</th>
-                <th>Status</th>
-                <th>Created At</th>
                 <th>Responses</th>
                 <th>Actions</th>
               </tr>
@@ -963,10 +833,9 @@ const Surveys = () => {
             <tbody>
               {filteredSurveys.map(survey => (
                 <tr key={survey.id} style={{ borderBottom: '1px solid #232323' }}>
-                  <td>{survey.idea_name}</td>
+                  <td>{survey.id}</td>
+                  <td>{survey.idea_name} ({survey.idea_id})</td>
                   <td>{survey.creator_email}</td>
-                  <td><span style={getStatusBadge(survey.survey_status)}>{survey.survey_status}</span></td>
-                  <td>{survey.created_at ? new Date(survey.created_at).toLocaleDateString() : '-'}</td>
                   <td>{survey.total_responses || 0}</td>
                   <td>
                     <button onClick={() => setSelectedSurvey(survey)} className="btn-primary" style={{ marginRight: '8px', padding: '4px 12px', fontSize: '12px' }}>View</button>
@@ -978,9 +847,11 @@ const Surveys = () => {
           </table>
         )}
       </div>
-      {/* ...existing modals and dialogs... */}
+
+      {/* Create Form Modal */}
+      {showCreateForm && <CreateFormComponent />}
     </div>
   );
 };
 
-export default Surveys;
+export default Forms;

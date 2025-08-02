@@ -9,7 +9,9 @@ import Analytics from './pages/Analytics';
 import Surveys from './pages/Surveys';
 import SMEInformation from './pages/SMEInformation';
 import Settings from './pages/Settings';
+
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
+
 
 function AppContent() {
   const { user, logout } = useContext(AuthContext);
@@ -27,6 +29,7 @@ function AppContent() {
           <Route path="/surveys" element={<Surveys />} />
           <Route path="/sme-matching" element={<SMEInformation />} />
           <Route path="/settings" element={<Settings />} />
+      
           <Route path="*" element={<Navigate to="/user-management" />} />
         </Routes>
       </Layout>

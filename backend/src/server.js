@@ -78,6 +78,10 @@ import { approveUser } from './ADMIN/users/approveUser.js';
 import { createUser } from './ADMIN/users/createUser.js';
 import { deleteUser } from './ADMIN/users/deleteUser.js';
 import { getAllUsers } from './ADMIN/users/getAllUsers.js';
+import { getUserUsageLimits } from './ADMIN/users/getUserUsageLimits.js';
+import { updateUserUsageLimits } from './ADMIN/users/updateUserUsageLimits.js';
+import { getUsageOverview } from './ADMIN/users/getUsageOverview.js';
+
 
 
 config();
@@ -348,31 +352,39 @@ export const app = async (event, context, requestId) => {
             return await healthCheck(body);
         }
         case API_PATHS.USER_OVERVIEW: {
-            return await userOverview(body);
+            const period = event.queryStringParameters?.period || 'all';
+            return await userOverview({ ...body, period });
         }
         case API_PATHS.USER_GROWTH: {
-            return await userGrowth(body);
+            const period = event.queryStringParameters?.period || '30';
+            return await userGrowth({ ...body, period });
         }
         case API_PATHS.USER_DEMOGRAPHICS: {
             return await userDemographics(body);
         }
         case API_PATHS.IDEAS_OVERVIEW: {
-            return await ideasOverview(body);
+            const period = event.queryStringParameters?.period || 'all';
+            return await ideasOverview({ ...body, period });
         }
         case API_PATHS.FORMS_OVERVIEW: {
-            return await formsOverview(body);
+            const period = event.queryStringParameters?.period || 'all';
+            return await formsOverview({ ...body, period });
         }
         case API_PATHS.SME_OVERVIEW: {
-            return await smeOverview(body);
+            const period = event.queryStringParameters?.period || 'all';
+            return await smeOverview({ ...body, period });
         }
         case API_PATHS.BOOKINGS_OVERVIEW: {
-            return await bookingsOverview(body);
+            const period = event.queryStringParameters?.period || 'all';
+            return await bookingsOverview({ ...body, period });
         }
         case API_PATHS.CHIME_OVERVIEW: {
-            return await chimeOverview(body);
+            const period = event.queryStringParameters?.period || 'all';
+            return await chimeOverview({ ...body, period });
         }
         case API_PATHS.CHIME_TRANSCRIPTS: {
-            return await chimeTranscripts(body);
+            const period = event.queryStringParameters?.period || '30';
+            return await chimeTranscripts({ ...body, period });
         }
         case API_PATHS.ENGAGEMENT_FUNNEL: {
             return await engagementFunnel(body);
@@ -380,7 +392,6 @@ export const app = async (event, context, requestId) => {
         case API_PATHS.REALTIME_DASHBOARD: {
             return await realtimeDashboard(body);
         }
-
                 /**
          * ADMIN USER MANAGEMENT ROUTES
          */
@@ -395,6 +406,19 @@ export const app = async (event, context, requestId) => {
         }
         case ADMIN_API_PATHS.GET_ALL_USERS: {
             return await getAllUsers(body);
+        }
+        case ADMIN_API_PATHS.GET_USER_USAGE_LIMITS: {
+        const userId = event.pathParameters?.userId || body.userId;
+            return await getUserUsageLimits({ ...body, userId });
+        }
+        case ADMIN_API_PATHS.UPDATE_USER_USAGE_LIMITS: {
+            const userId = event.pathParameters?.userId || body.userId;
+            return await updateUserUsageLimits({ ...body, userId });
+        }
+        case ADMIN_API_PATHS.GET_USAGE_OVERVIEW: {
+            const personaType = event.queryStringParameters?.personaType;
+            const status = event.queryStringParameters?.status;
+            return await getUsageOverview(body, event);
         }
 
 
