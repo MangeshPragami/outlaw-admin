@@ -1,0 +1,37 @@
+service: outlaw-fullstack-dev-builds
+
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ap-south-1
+  
+  environment:
+      PORT: ${{ vars.PORT }}
+      DB_HOST: ${{ vars.DB_HOST }}
+      DB_PORT: ${{ vars.DB_PORT }}
+      DB_USER: ${{ vars.DB_USER }}
+      DB_PASSWORD: ${{ vars.DB_PASSWORD }}
+      DB_NAME: ${{ vars.DB_NAME }}
+      NODE_ENV: ${{ vars.NODE_ENV }}
+      JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
+      JWT_EXPIRES_IN: ${{ vars.JWT_EXPIRES_IN }}
+
+functions:
+  app:
+    name: AdminLambda   # MUST match the exact function name already created in AWS
+    handler: index.handler
+
+package:
+  individually: true
+  exclude:
+    - .git/**
+    - .serverless/**
+    - README.md
+    - package-lock.json
+    - .env
+    - .vscode/**
+    - local-server.js
